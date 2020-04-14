@@ -1,0 +1,173 @@
+body {
+    padding-top: 100px;
+}
+
+/* Wrapping element */
+/* Set some basic padding to keep content from hitting the edges */
+.body-content {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Carousel */
+.carousel-caption p {
+    font-size: 20px;
+    line-height: 1.4;
+}
+
+/* Make .svg files in the carousel display properly in older browsers */
+.carousel-inner .item img[src$=".svg"] {
+    width: 100%;
+}
+
+/* QR code generator */
+#qrCode {
+    margin: 15px;
+}
+
+/* Hide/rearrange for smaller screens */
+@media screen and (max-width: 767px) {
+    /* Hide captions */
+    .carousel-caption {
+        display: none;
+    }
+}
+
+.panel-body {
+    background-color: rgb(225,225,225);
+    text-align: center;
+}
+
+    .panel-body.imgContent {
+        padding: 0;
+    }
+
+.imgContent .progress {
+    margin: 0;
+}
+
+.panel {
+    margin-bottom: 0;
+}
+
+.loading {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255,255,255,0.7);
+    top: 0;
+    left: 0;
+    z-index: 10000;
+    text-align: center;
+    line-height: 751px;
+}
+
+    .loading img {
+        vertical-align: middle;
+        display: inline-block;
+    }
+
+.flex {
+    display: flex;
+    /*flex-grow: 2;*/
+    /*flex-shrink: 2;*/
+    flex-flow: row wrap;
+    /*    flex-wrap: wrap;*/
+}
+
+@media (max-width:500px) {
+    .flex-item {
+        flex: 0 0 50%;
+        padding: 0 15px;
+    }
+}
+
+@media (min-width:700px) {
+    .flex-item {
+        flex: 0 0 25%;
+        padding: 0 15px;
+    }
+}
+
+
+.flex-item-text {
+    width: 100%;
+    overflow: hidden;
+}
+
+.vote-progress {
+    height: 370px !important;
+    width: 70px;
+    line-height: 200px;
+    position: relative !important;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0px !important;
+    background-color: transparent;
+    display: flex;
+    flex-direction: row-reverse;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    align-content: flex-end;
+}
+
+.vote-progress-bar {
+    width: 100% !important;
+    vertical-align: bottom;
+    display: inline-block;
+    /*position: absolute;*/
+    position: relative;
+    bottom: 0;
+    /*border-radius: 7px 7px 0 0 !important;*/
+    /*overflow: hidden;*/
+}
+
+.vote-progress-bar {
+    background-color: rgb(232,105,2);
+    background-image: -moz-linear-gradient(top, rgb(232,105,2), rgb(255,234,0));
+    background-image: -o-linear-gradient(top, rgb(232,105,2), rgb(255,234,0));
+    background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(232,105,2)), to(rgb(255,234,0)));
+    background-image: -webkit-linear-gradient(top, rgb(232,105,2), rgb(255,234,0));
+    background-image: linear-gradient(to bottom, rgb(232,105,2), rgb(255,234,0));
+    /*linear-gradient(0deg, blue, green 40%, red);*/
+}
+
+    .vote-progress-bar.bossProgressbar {
+        background-color: rgb(35,165,213);
+        background-image: -moz-linear-gradient(top, rgb(35,165,213), rgb(6,115,93));
+        background-image: -o-linear-gradient(top, rgb(35,165,213), rgb(6,115,93));
+        background-image: -webkit-gradient(linear, left top, left bottom, from(rgb(35,165,213)), to(rgb(6,115,93)));
+        background-image: -webkit-linear-gradient(top, rgb(35,165,213), rgb(6,115,93));
+        background-image: linear-gradient(to bottom, rgb(35,165,213), rgb(6,115,93));
+    }
+
+.customerProgressbar .progressBarNum {
+    position: absolute;
+    left: -26px;
+}
+
+.bossProgressbar .progressBarNum {
+    /*text-align: right;*/
+    position: absolute;
+    right: -86px;
+}
+
+.voteLogArea {
+    /*max-height: 400px;
+    height: 400px;
+    max-height: 400px;
+    overflow: auto;
+    position: relative;*/
+}
+
+.voteLogContainer {
+    /*position: absolute;*/
+    /*bottom: 0;*/
+}
+
+.radiusBtn {
+    width: 50px;
+    -moz-border-radius: 25px;
+    -webkit-border-radius: 25px;
+    border-radius: 25px;
+}

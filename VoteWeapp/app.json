@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/logs/logs",
+    "pages/login/login",
+    "pages/vote/vote",
+    "pages/thanks/thanks",
+    "pages/voteWaiting/voteWaiting",
+    "pages/wxq/wxq",
+    "pages/voteTimeout/voteTimeout",
+    "pages/voteStop/voteStop"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#fff",
+    "navigationBarTitleText": "WeChat",
+    "navigationBarTextStyle": "black"
+  }
+}

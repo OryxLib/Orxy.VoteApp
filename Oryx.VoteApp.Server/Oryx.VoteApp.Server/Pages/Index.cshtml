@@ -1,0 +1,125 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+<style>
+    .right {
+        float: right;
+    }
+</style>
+<div class="jumbotron">
+    <h1>欢迎使用</h1>
+    <p>现场投票小程序管理后台</p>
+    @*<p><a class="btn btn-primary btn-lg" href="#" role="button">Learn more</a></p>*@
+</div>
+<div>
+    <form id="uploadForm">
+        <label class="btn btn-default">
+            <input id="file" type="file" name="file" style="display:none;" onchange="importProfile(this)" />
+            导入员工资料
+        </label> <label class="btn btn-default">
+            <a href="/Game/OutputWxqData">导出微信墙</a>
+        </label> <label class="btn btn-default">
+            <a href="/Game/OuputWxqPicData">导出图片墙</a>
+        </label>
+    </form>
+</div>
+<ul class="list-group">
+    @foreach (var item in Model.VoteInfoList)
+    {
+        <li class="list-group-item">
+            <a href="/voteDetail/@item.Id">@item.Name</a>
+            @if (!item.IsEnable)
+            {
+                <span>开启时间 : @item.EnableTime.ToString("yyyy-MM-dd")</span>
+            }
+            else if (item.IsEnable && !item.Expired)
+            {
+                <span>进行中</span>
+            }
+            else
+            {
+                <span>已过期</span>
+            }
+            @if (item.IsOpen)
+            {
+                <button class="btn btn-success right">开启中</button>
+            }
+            else
+            {
+                <button class="btn btn-error right" onclick="changeOpenStatus(@item.Id)">关闭中</button>
+            }
+            <a class="right" style="margin-right:20px;" href="javascript:delVote(@item.Id);">删除</a>
+            <a class="right" style="margin-right:20px;" target="_blank" href="/VoteEdit/@item.Id">编辑</a>
+            <a class="right" style="margin-right:20px;" target="_blank" href="/HugeScreenGD/@item.Id">结果展示</a>
+        </li>
+    }
+</ul>
+
+@section Scripts{
+    <script>
+        function changeOpenStatus(voteId) {
+            $.ajax({
+                url: '/game/OpenVote',
+                data: {
+                    voteId: voteId
+                }
+                , success: function (res) {
+                    if (res.result) {
+                        alert('开启成功!')
+                        window.location = window.location;
+                    }
+                    else {
+                        alert('开启失败...')
+                    }
+                },
+                error: function () {
+                    alert('开启失败, 500')
+                }
+            })
+        }
+        function importProfile(e) {
+            if (!e.files || e.files.length < 1) {
+                return;
+            }
+            var formData = new FormData();
+            formData.append('file', e.files[0]);
+            $.ajax({
+                url: '/game/LoadUserExcel',
+                type: 'POST',
+                cache: false,
+                data: formData,
+                processData: false,
+                contentType: false
+            }).done(function (res) {
+                if (res.success) {
+                    alert('导入资料成功')
+                } else {
+                    alert('导入资料失败')
+                }
+            }).fail(function (res) {
+                alert('请求失败')
+            });
+            e.value = '';
+        }
+
+        function delVote(voteId) {
+            if (confirm("确定删除?")) {
+                $.ajax({
+                    url: '/game/delVote',
+                    type: 'POST',
+                    cache: false,
+                    data: {
+                        voteId: voteId
+                    },
+                }).done(function (res) {
+                    alert('删除成功');
+                    window.location = window.location;
+                }).fail(function (res) {
+                    alert('删除失败')
+                });
+            }
+        }
+    </script>
+}

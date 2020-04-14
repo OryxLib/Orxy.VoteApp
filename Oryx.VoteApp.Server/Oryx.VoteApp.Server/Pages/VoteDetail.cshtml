@@ -1,0 +1,426 @@
+﻿@page "{voteId?}"
+@model Oryx.VoteApp.Server.Pages.VoteDetailModel
+@{
+    //ViewData["Title"] = "VoteDetail";
+}
+
+<style>
+    .flex-item {
+        width: 20%;
+    }
+</style>
+<h2>@Model.VoteInfo.Name</h2>
+
+<div>
+    开启时间:
+    @Model.VoteInfo.EnableTime
+</div>
+<div id="alertContainer">
+
+</div>
+
+<div>
+    <div style="margin: 30px 0;">
+        <button type="button" class="btn btn-primary" id="btnStart">开始投票</button>
+        <a class="btn btn-success" target="_blank" href="/game/DownloadVoteLogs?voteId=@Model.VoteInfo.Id">下载结果</a>
+        <button type="button" class="btn btn-primary" id="btnReset">重置投票状态</button>
+        <a class="btn btn-primary" href="/HugeScreenGD/@Model.VoteInfo.Id" style="background-color:#c818b0;">显示结果到荧幕</a>
+        @if (Model.VoteInfo.IsEnable)
+        {
+            <button class="radiusBtn btn btn-warning" onclick="goPause()"><span class="glyphicon glyphicon-pause"></span></button>
+        }
+        else
+        {
+            <button class="radiusBtn btn btn-success" onclick="goPlay()"><span class="glyphicon glyphicon-play"></span></button>
+        }
+        <span id="txtDaojishi" style="margin-left:100px;">
+
+        </span>
+    </div>
+    <div style="margin: 30px 0;">
+        <button type="button" class="btn btn-primary" onclick="addBossBuff()">增加Boss权重</button>
+    </div>
+    <div style="margin: 30px 0;">
+        <a href="/BossVote?voteId=@Model.VoteInfo.Id&bossId=boss1" class="btn btn-info">Boss1 投票</a>
+        <a href="/BossVote?voteId=@Model.VoteInfo.Id&bossId=boss2" class="btn btn-info">Boss2 投票</a>
+        <a href="/BossVote?voteId=@Model.VoteInfo.Id&bossId=boss3" class="btn btn-info">Boss3 投票</a>
+        <a href="/BossVote?voteId=@Model.VoteInfo.Id&bossId=boss4" class="btn btn-info">Boss4 投票</a>
+        <a href="/BossVote?voteId=@Model.VoteInfo.Id&bossId=boss5" class="btn btn-info">Boss5 投票</a>
+    </div>
+    <div class="flex ">
+        @for (int i = 0; i < Model.VoteInfo.VoteOptions.Count; i++)
+        {
+            var item = Model.VoteInfo.VoteOptions[i];
+            <div class="flex-item">
+                <h4 class="flex-item-heading">
+                    <span>@item.Key</span>
+                </h4>
+                <p class="flex-item-text">
+                    <img src="@item.Value?imageView2/1/w/200/h/200/q/75|imageslim" class="img-thumbnail" alt="@item.Key" />
+                </p>
+                <span>
+                    投票结果: <span class="badge" id="option@(item.Id)" data-txt="@item.Key">
+                        @{
+                            if (item.Key != null && Model.VoteLog.ContainsKey(item.Key))
+                            {
+                                <span>@Model.VoteLog[item.Key]</span>
+                            }
+                            else
+                            {
+                                <span> 0 </span>
+                            }
+                        }
+                    </span>
+                </span>
+                <div class="form-group has-error">
+                    @*<label class="control-label" for="inputError1">Boss 1</label>*@
+                    <input type="number" class="groupBossBuffer1 form-control" data-option="@item.Key" min="0" max="40" value="0" placeholder="Boss1" />
+                </div>
+                <div class="form-group has-success">
+                    @*<label class="control-label" for="inputError1">Boss 2</label>*@
+                    <input type="number" class="groupBossBuffer2 form-control" data-option="@item.Key" min="0" max="40" value="0" placeholder="Boss2" />
+                </div>
+                <div class="form-group has-warning">
+                    @*<label class="control-label" for="inputError1">Boss 3</label>*@
+                    <input type="number" class="groupBossBuffer3 form-control" data-option="@item.Key" min="0" max="40" value="0" placeholder="Boss3" />
+                </div>
+                @*<button class="btn btn-default" onclick="addBuff('@item.Key')">+</button>*@
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/template" id="successAlert">
+        <div class="alert alert-dismissible alert-success">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <span>操作成功!</span>
+        </div>
+
+    </script>
+    <script type="text/template" id="dangerAlert">
+        <div class="alert alert-dismissible alert-danger">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <span>操作失败...</span>
+        </div>
+    </script>
+    <script>
+      var isEnable =@(Model.VoteInfo.IsEnable ? "true":"false");
+       var  timeToStop= Math.floor(((new Date() - Math.floor(@Model.VoteInfo.EnableStartTime)) / 1000))
+        var daojishi =@Model.VoteInfo.CloseSeconds- timeToStop;
+        daojishi *= 1000;
+        timer = setInterval(function () {
+            var timeshow = new Date().toLocaleString().replace(/^\.\d+Z$/g, '').replace(/\T/g, ' ')
+            var timeToHoure = (daojishi - 60 * 60 * 1000)
+            var timeToMiniutes = (daojishi - timeToHoure - 60 * 1000)
+            var timeToSeconds = daojishi - timeToHoure - timeToMiniutes
+
+            var t = daojishi
+            var seconds = Math.floor((t / 1000) % 60)
+            var minutes = Math.floor((t / 1000 / 60) % 60)
+            var hours = Math.floor((t / (1000 * 60 * 60)) % 24)
+            var days = Math.floor(t / (1000 * 60 * 60 * 24))
+
+            if (daojishi > 0 && isEnable) {
+                var txtSum="";
+                if (days>0) {
+                    txtSum += days + " 天 "
+                }
+                if (hours > 0) {
+                    txtSum += hours + " 时 "
+                }
+                if (minutes > 0) {
+                    txtSum += minutes + " 分 "
+                }
+                if (seconds >= 0) {
+                    txtSum += seconds+"秒"
+                }
+                $('#txtDaojishi').text(txtSum)
+            } else {
+            }
+            daojishi -= 1000;
+        }, 1000)
+    </script>
+    <script>
+        var socketlist = [];
+        var voteResultDic = {};
+        var currentVoteId=@Model.VoteInfo.Id;
+        function addBossBuff( ) {
+            if (confirm('确定投票给他吗?')) {
+                //var boss1ValueList = [];
+                //var boss2ValueList = [];
+                //var boss3ValueList = [];
+
+                var optionScoreDic= {};
+
+                $('.groupBossBuffer1').each(function () {
+                    var scoreValue = parseInt( $(this).val());
+                    if (!scoreValue) {
+                        return;
+                    }
+                    var optionValue = $(this).data('option')
+                    if (!optionScoreDic[optionValue]) {
+                        optionScoreDic[optionValue] = {}
+                    }
+                    optionScoreDic[optionValue]['boss1'] = scoreValue;
+                })
+                $('.groupBossBuffer2').each(function () {
+                    var scoreValue = parseInt($(this).val());
+                    if (!scoreValue) {
+                        return;
+                    }
+                    var optionValue = $(this).data('option')
+                    if (!optionScoreDic[optionValue]) {
+                        optionScoreDic[optionValue] = {}
+                    }
+                    optionScoreDic[optionValue]['boss2'] = scoreValue;
+                 })
+                $('.groupBossBuffer3').each(function () {
+                    var scoreValue = parseInt($(this).val());
+                    if (!scoreValue) {
+                        return;
+                    }
+                    var optionValue = $(this).data('option')
+                    if (!optionScoreDic[optionValue]) {
+                        optionScoreDic[optionValue] = {}
+                    }
+                    optionScoreDic[optionValue]['boss3'] = scoreValue;
+                })
+                //console.log(optionScoreDic);
+                //convert to percent
+                var optionBossSumDic = {};
+                var optionSumDic = {};
+                var optionPercentDic = {};
+                //get boss sum
+                Object.keys(optionScoreDic).forEach(function (item) {
+                    var currentObj = optionScoreDic[item];
+                    Object.keys(currentObj).forEach(function (subItem) {
+                        var subScoreValue = currentObj[subItem];
+                        if (!optionBossSumDic[subItem]) {
+                            optionBossSumDic[subItem] = 0;
+                        }
+                        optionBossSumDic[subItem] += subScoreValue;
+                        //currentOptionScoreSum += subScoreValue;
+                    })
+                 })
+                console.log(optionBossSumDic);
+                //get option sum
+                Object.keys(optionScoreDic).forEach(function (item) {
+                    //var currentOptionScoreSum = 0;
+                    var currentObj = optionScoreDic[item];
+                    //get sum
+                    //Object.keys(currentObj).forEach(function (subItem) {
+                    //    var subScoreValue = currentObj[subItem];
+                    //    currentOptionScoreSum += subScoreValue;
+                    //})
+                    //if (!optionSumDic[item]) {
+                    //    optionSumDic[item] = 0
+                    //}
+                    //optionSumDic[item] += currentOptionScoreSum;
+                    if (!optionPercentDic[item]) {
+                        optionPercentDic[item] = {};
+                    }
+                    //get percent
+                    Object.keys(currentObj).forEach(function (subItem) {
+                        var subScoreValue = currentObj[subItem];
+                        optionPercentDic[item][subItem] = subScoreValue / optionBossSumDic[subItem] * (50 / 3);
+                    })
+                })
+                optionPercentDic.type ='addBuff'
+                console.log(optionPercentDic);
+                $.ajax({
+                    url: '/vote/AddBossBuff',
+                    dataType: 'text',
+                    type:'post',
+                    //contentType:'text/plain',
+                    data: {
+                        voteId:@Model.VoteInfo.Id,
+                        option: JSON.stringify( optionPercentDic)
+                    },
+                    success: function (res) {
+
+                    },
+                    error: function (err) {
+
+                     }
+                })
+            }
+        }
+
+        function addBuff(voteOption ) {
+            if (confirm('确定投票给他吗?')) {
+                $.ajax({
+                    url: '/vote/AddBuff',
+                    dataType: 'json',
+                    data: {
+                        voteId:@Model.VoteInfo.Id,
+                        option: voteOption
+                    },
+                    type: 'post',
+                    success: function (res) {
+
+                    },
+                    error: function (err) {
+
+                     }
+                })
+            }
+        }
+
+        function goPlay() {
+            startVote();
+        }
+
+        function goPause() {
+            if (confirm('确定停止投票吗')) {
+                $.ajax({
+                    url: '/vote/EndVote',
+                    type:'POST',
+                    data: {
+                        Id:'@Model.VoteInfo.Id'
+                    },
+                    success: function (res) {
+                        if (res.result=='success') {
+                            alert('success')
+                            window.location = window.location
+                        } else {
+                            alert('danger')
+                        }
+                    },
+                    error: function () {
+                        alert('danger')
+                     }
+                })
+            }
+        }
+
+        function startVote() {
+            var closeSeconds = prompt('请输入启动时间');
+            var closeSecondsInt = parseInt(closeSeconds);
+            if (!closeSecondsInt) {
+                alert('错误, 请输入数字 !')
+                return;
+            }
+             $.ajax({
+                    url: '/vote/StartVote',
+                    data: {
+                        Id: '@Model.VoteInfo.Id',
+                        closeSecondes: closeSecondsInt
+                    },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (res) {
+                        if (res.result == "success") {
+                            alert('success')
+                            window.location = window.location
+                        } else {
+                            alert('danger')
+                        }
+                    },
+                    error: function () {
+                        alert('danger')
+                    }
+                })
+        }
+
+        function alert(type) {
+            if (type == 'success') {
+                $('#alertContainer').append($('#successAlert').html()).delay(1000).queue(function (next) {
+                    $('#alertContainer').empty();
+                    next();
+                })
+            } else {
+                $('#alertContainer').append($('#dangerAlert').html()).delay(1000).queue(function (next) {
+                    $('#alertContainer').empty();
+                    next();
+                })
+            }
+         }
+        var voteResult = {};
+        function changerVoteData(value) {
+            if (value) {
+                if (!voteResult[value]) {
+                    voteResult[value] = 1;
+                } else {
+                    voteResult[value]++;
+                }
+                $('span[data-txt="' + value + '"]').text(voteResult[value])
+                //var jsonValue = JSON.parse(value)['globalVoteResultDic'];
+                ////for (var valueItemIndex in jsonValue) {
+                //    var valueItem = jsonValue[currentVoteId];
+                //    for (var subIndex = 0; subIndex < valueItem.length; subIndex++) {
+                //        var subImte = valueItem[subIndex];
+                //        $('span[data-txt="' + subImte.voteOption + '"]').text(subImte.voteSum)
+                //    }
+                ////}
+            }
+        }
+        function CreateWebSocket() {
+                var socket = new WebSocket((window.location.protocol.indexOf('https')>-1?"wss://":"ws://") + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=voteResult");
+            socketlist.push(socket);
+            socket.onopen = function (res) {
+                console.log(res);
+            }
+
+            socket.onmessage = function (res) {
+                console.log(res.data);
+                changerVoteData(res.data);
+            }
+
+            socket.onerror = function (res) {
+                console.log(res);
+            }
+
+            socket.onclose = function (res) {
+                setTimeout(function () {
+                    //socket = new WebSocket("ws://" + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=voteResult");
+                    socket = new WebSocket( (window.location.protocol.indexOf('https')>-1?"wss://":"ws://") + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=voteResult");
+                }, 3000)
+            }
+
+            function sendMsg() {
+                setInterval(function () {
+                    socket.send("test data");
+                }, 3000);
+
+            }
+            setTimeout(sendMsg, 5000);
+        }
+        for (var i = 0; i < 1; i++) {
+            CreateWebSocket();
+        }
+
+    window.onunload = function () {
+        for (var i = 0; i < socketlist.length; i++) {
+            socketlist[i].close();
+        }
+    }
+
+        $(document).ready(function () {
+            $('#btnReset').click(function () {
+                 $.ajax({
+                url: '/vote/resetVote',
+                dataType: 'json',
+                data: {
+                   Id:'@Model.VoteInfo.Id'
+                },
+                type: 'post',
+                success: function (res) {
+                    if (res.success) {
+                        window.location = window.location;
+                        alert('success')
+                    } else {
+                        alert('danger')
+                    }
+                },
+                     error: function () {
+                         alert('danger')
+                     }
+            })
+         })
+        $('#btnStart').click(function () {
+            startVote();
+        })
+    })
+    </script>
+}

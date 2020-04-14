@@ -1,0 +1,31 @@
+<!--index.wxml-->
+<view class="container" style='background-image:url({{bgImg}})'>
+  <view class='logo '>
+    <text class='titleContainer'> 
+      <!-- <text class='default'>{{title}}</text> -->
+    <text class='warning'>  Voting time: {{timeToStop>0?timeToStopDisplay:'超时'}}  </text>
+    </text>
+    <!-- <view class='right '>
+        <view class='number '>1</view>
+        <view class='status '>进行中</view>
+      </view> -->
+  </view>
+  <scroll-view scroll-y class="warp">
+    <checkbox-group bindchange="checkboxChange">
+      <view class="options" wx:for="{{Options}}">
+        <text class='optTxt'>{{item.Name?item.Name:'Photo '+((index+1)<10?'0'+(index+1):index+1)}} </text>
+        <image class='option ' mode='aspectFill ' src='{{item.ImgUrl}}?imageView2/1/w/300/h/300/q/75|imageslim' bindtap="showImg" data-src='{{item.ImgUrl}}'></image>
+        <text class='optTxt'>{{item.Description}} </text>
+        <!-- <checkbox class='optionCbx ' value="{{item.Name}}" data-id='{{item.Id}}' checked='{{item.Name==selected}}'></checkbox> -->
+        <picker mode="selector" bindchange="bindChange" data-optIndex='{{index}}' value="{{multiIndex}}" range="{{['A. '+item.Option1,'B. '+item.Option2,'C. '+item.Option3,'D.  '+item.Option4]}}">
+          <view class="picker">
+            {{ResultDic[index]||'--请选择答案-- ▼'}}
+          </view>
+        </picker>
+      </view>
+    </checkbox-group>
+  </scroll-view>
+
+  <!-- <button class='btnAction' bindtap="voted">確認 | Confirm</button> -->
+  <image class='btnImg' src='/img/btnSubmit.png' bindtap="voted"></image>
+</view>

@@ -1,0 +1,19 @@
+<!--pages/voteWaiting.wxml-->
+<view class='container' style='background-image:url({{bgImg}})'>
+  <!-- <image src='/img/logo.png' mode='aspectFit'></image> -->
+
+  <!-- <view>倒计时</view>
+  <view>{{timeStampDate}}</view> -->
+  <view class="btn-area" wx:if="{{isEnable}}">
+    <button formType="submit" class='btn btnAction' bindtap='gotovote'>立即參與 | Go </button>
+  </view>
+  <view class="btn-area" wx:elif='{{!isEnable&&isConnected}}'>
+    <view class='txtTitle'>
+      <image src='/img/isNotOpen.png'></image>
+    </view>
+    <button formType="submit" disabled='diabled'>请等待...</button>
+  </view>
+  <view class='btn-area' wx:else>
+    <button bindtap='refresh'>刷新</button>
+  </view>
+</view>

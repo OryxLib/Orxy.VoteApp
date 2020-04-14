@@ -1,0 +1,12 @@
+<!--pages/login/login.wxml-->
+<view class="logo container" style='background-image:url({{bgImg}})'> 
+  <view>{{_title}}</view>
+  <form class='formMain' bindsubmit="formSubmit" bindreset="formReset">
+    <view class="section"> 
+      <input name="password" placeholder="员工编号 | Staff Number" />
+    </view>
+    <view class="btn-area"> 
+      <image formType="submit" class='btnImg' src='/img/btnStart.png' bindtap='goVote'></image>
+    </view>
+  </form>
+</view>

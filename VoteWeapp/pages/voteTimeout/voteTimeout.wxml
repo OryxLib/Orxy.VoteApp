@@ -1,0 +1,20 @@
+<view class='container' style='background-image:url({{bgImg}})'>
+  <view class='voteTimeout'>
+    <!-- <text class='lostvote'>抱歉, 您超时未投票
+    请等待查看结果
+    </text>
+    <text class='lostvote'>Sorry the voting time is up
+    Please check with the result afterwards
+    </text> -->
+    <image src='/img/timeout.png'></image>
+  </view>
+  <!-- <view class="btn-area" wx:if='{{isConnected}}'>
+    <view class='txtTitle'>下一活动还未开启 , 请等待</view>
+    <button disabled='diabled'>请等待...</button>
+  </view>
+  <view class='btn-area' wx:else>
+    <button formType="submit" bindtap='gotoRefresh'>刷新</button>
+  </view> -->
+</view>
+
+<!-- <button class='btnAction' bindtap='goBack'>回到首页</button> -->

@@ -1,0 +1,18 @@
+/* pages/thanks/thanks.wxss */
+
+page {
+  background-color: #eee;
+  text-align: center;
+}
+
+text {
+  width: 100%;
+  display: block;
+  font-size: 1.3rem;
+  color: #000;
+}
+
+image {
+  width: 700rpx;
+  height: 250rpx;
+}

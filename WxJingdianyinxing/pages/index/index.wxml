@@ -1,0 +1,16 @@
+<!--index.wxml-->
+<view class="container" style='background-image:url({{bgImg}})'>
+  <view class=".userinfo">
+    <button class='usermotto' wx:if="{{!hasUserInfo && canIUse}}" open-type="getUserInfo" bindgetuserinfo="getUserInfo"> 登录 </button>
+    <block wx:else>
+      <!-- <image class='title' src='/img/title.png'> </image> -->
+      <!-- <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
+      <text class="userinfo-nickname">{{userInfo.nickName}}</text> -->
+      <input class='txtInput' bindinput='textInput' bindconfirm='textConfirm' placeholder='员工编号（6位数字）'></input>
+      <image class='btnImg' src='/img/btnGo.png' bindtap='gotoVote'> </image>
+    </block>
+  </view>
+  <!-- <view class="usermotto">
+    <text class="user-motto">{{motto}}</text>
+  </view> -->
+</view>

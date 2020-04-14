@@ -1,0 +1,189 @@
+﻿@page
+@model Oryx.VoteApp.Server.Pages.WxqPicModel
+@{
+    ViewData["Title"] = "图片讯息墙";
+    Layout = "_WxqLayout.cshtml";
+    //ViewData["wxqBg"] = "background-image:url('/images/WxqPicBg.jpg')";
+    ViewData["wxqBg"] = "background-image:url('/images/WcqBgImg.jpg')";
+}
+<link href="~/css/kaiBanner.css" rel="stylesheet" />
+<style>
+    .imgContainer {
+        width: 100%;
+        height: 100%;
+        display: inline-block;
+        overflow: hidden;
+    }
+
+        .imgContainer img {
+            height: 100%;
+        }
+
+    .container.body-content {
+        height: 100%;
+    }
+
+    .highlight {
+        border: 1px solid yellow !important;
+    }
+
+    button.close {
+        /*display: none;*/
+        color: #efe;
+    }
+
+    span.imgItem:hover button.close {
+        display: block;
+    }
+</style>
+<div class="container body-content">
+    <div style=" ">
+        <div class=" ">
+            <div class="kai_banner_container clearfix">
+                <div class="kai_banner_body clearfix" id="bigImgContainer">
+                    @if (Model.WxqLogList != null)
+                    {
+                        foreach (var item in Model.WxqLogList)
+                        {
+                            <div class="imgContainer"><img style="height:100%;" src="@item.Msg?imageslim" /></div>
+                        }
+                    }
+                </div>
+                <div class="kai_banner_bottombtns" id="smallPicContainer">
+                    @if (Model.WxqLogList != null)
+                    {
+                        foreach (var item in Model.WxqLogList)
+                        {
+                            <span class="imgItem" style='background-image: url("@item.Msg?imageslim")'>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="deleteMsg(@item.Id,this)"><span aria-hidden="true">&times;</span></button>
+                            </span>
+                        }
+                    }
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script src="//code.jquery.com/jquery-latest.min.js"></script>
+    <script src="~/js/jquery.kaibanner.js"></script>
+    @*<script src="~/js/jquery.kaibanner.min.js"></script>*@
+    <script>
+        var kaiBannerInstance = $('.kai_banner_container').kaiBanner({
+            speed: 1000,
+            fixedWidth: false,
+            minWidth: 0,
+            intervalTime: 3000,
+            throtteDelayTime: 50,
+            throtteMaxTime: 1000,
+            highlightClass: 'highlight'
+        });
+        kaiBannerInstance.init();
+    </script>
+}
+<script>
+    var socketlist = [];
+
+    var dataDic = [];
+    dataIndex = 0;
+    var dataObjList = new Array(@Model.WxqLogList.Count|| 0);
+    function deleteMsg(dataId, e) {
+        var picIndex = $(e).parent().index();
+        $('#bigImgContainer').children().eq(picIndex).remove();
+        $('#smallPicContainer').children().eq(picIndex).remove();
+        dataObjList.splice(picIndex, 1);
+        kaiBannerInstance.init();
+        $.ajax({
+            url: '/WxqFunc/DeleteMsg',
+            dataType: 'json',
+            type: 'post',
+            data: {
+                Id: dataId
+            },
+            success: function (res) {
+
+            }
+        })
+    }
+
+    function CreateWebSocket() {
+        var socket = new WebSocket((window.location.protocol.indexOf('https') > -1 ? "wss://" : "ws://") + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=wxqpic");
+        socketlist.push(socket);
+        socket.onopen = function (res) {
+            console.log(res);
+        }
+
+        socket.onmessage = function (res) {
+            console.log(res.data);
+            var dataObj = JSON.parse(res.data);
+
+            if (dataObjList.length == 101) {
+                dataObjList.shift();
+                $('#bigImgContainer').children().first().remove();
+                $('#smallPicContainer').children().first().remove();
+                //dataObjList = [];
+                //$('#bigImgContainer').css('left', 0)
+                //$('#bigImgContainer').empty();
+                //$('#smallPicContainer').empty();
+            }
+            dataObjList.push(dataObj);
+
+            var html = $('#voteLogChecked').html()
+                .replace(/{dataId}/g, dataObj.Id)
+                .replace(/{nickName}/g, dataObj.NickName)
+                .replace(/{avarta}/g, dataObj.Avarta)
+            $('#bigImgContainer').append('<div class="imgContainer"><img  style="height:100%;" src="' + dataObj.Msg + '?imageslim"/></div>')
+            $('#smallPicContainer').append("<span  class='imgItem'  style='background-image: url(" + dataObj.Msg + "?imageslim)'> <button type='button' class='close' data-dismiss='alert' aria-label='Close' onclick='deleteMsg(" + dataObj.Id + ",this)'><span aria-hidden='true'>&times;</span></button></span>")
+
+            kaiBannerInstance.init();
+            //if (dataObj.msgType == 'txt') {
+            //    html = html.replace(/{msg}/g, dataObj.msg)
+            //} else {
+            //    html = html.replace(/{msg}/g, '<img  style="width: 200px;" src="' + dataObj.msg + '"/>')
+            //}
+            dataIndex++;
+            $('.voteLogContainer').append(html);
+            $('html, body, .content').animate({ scrollTop: $(document).height() }, 300);
+        }
+
+        socket.onerror = function (res) {
+            console.log(res);
+        }
+
+        function sendMsg() {
+            setInterval(function () {
+                socket.send("test data");
+            }, 3000);
+
+        }
+        setTimeout(sendMsg, 5000);
+    }
+
+    function checkedData(dataId) {
+        $.ajax({
+            url: '/WxqFunc/PostCheckedMsg',
+            type: 'post',
+            dataType: 'json',
+            data: {
+                msg: dataDic[dataId]
+            },
+            success: function (res) {
+                //alert('操作成功')
+            },
+            error: function (err) {
+                //alert('操作失败')
+            }
+        })
+    }
+    for (var i = 0; i < 1; i++) {
+        CreateWebSocket();
+    }
+
+    window.onunload = function () {
+        for (var i = 0; i < socketlist.length; i++) {
+            socketlist[i].close();
+        }
+    }
+
+</script>

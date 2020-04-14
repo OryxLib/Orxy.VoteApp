@@ -1,0 +1,3 @@
+<view class="container"  style='background-image:url({{bgImg}})'>
+  <!-- <image src='/img/thanks.png' class='title'></image> -->
+</view>

@@ -1,0 +1,20 @@
+<!--pages/thanks/thanks.wxml-->
+<view class='container' style='background-image:url({{bgImg}})'>
+  <view style='margin-top:552rpx;'>
+    <image src='/img/thankvoted.png'></image>
+    <!-- <text>感謝你的參與!
+      請留意螢幕顯示結果
+    </text>
+    <text>Thank you for your voting!
+    Result will be displayed shortly
+    </text> -->
+  </view>
+  <!-- <view class="btn-area" wx:if='{{isConnected}}'>
+    <view class='txtTitle'>下一活动还未开启 , 请等待</view>
+    <button disabled='diabled'>请等待...</button>
+  </view>
+  <view class='btn-area' wx:else>
+    <button formType="submit" bindtap='gotoRefresh'>刷新</button>
+  </view> -->
+  <!-- <button class='btnAction' bindtap='goBack'>回到首页</button> -->
+</view>

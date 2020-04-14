@@ -1,0 +1,17 @@
+/* pages/voteTimeout/voteTimeout.wxss */
+text.lostvote {
+  width: 100%;
+  display: block;
+  margin-top: 20rpx;
+  font-size: 1rem;
+  color: black;
+}
+
+.voteTimeout {
+  text-align: center;
+  margin-top: 400rpx;
+}
+image {
+  width:700rpx;
+  height: 250rpx;
+}

@@ -1,0 +1,74 @@
+﻿@page
+@model Oryx.VoteApp.Server.Pages.JDLY.ResultModel
+@{
+    ViewData["Title"] = "Result";
+}
+<a class="btn btn-default" target="_blank" href="/Jdly/DownloadLogs?Id=@Model.JdlyId">下载结果</a>
+<button type="button" class="btn btn-danger" onclick="clearUp()">清除数据</button>
+<button type="button" class="btn btn-success" onclick="start()">启动</button>
+<table class="table table-striped table-hover ">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Staff ID</th>
+            <th>Nick Name</th>
+            <th>Total Num</th>
+            <th>Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.JdlyLogs != null)
+        {
+            for (int i = 0; i < Model.JdlyLogs.Count; i++)
+            {
+                var item = Model.JdlyLogs[i];
+
+                <tr>
+                    <td>@(i + 1).</td>
+                    <td>@item.UserCode</td>
+                    <td>@item.NickName</td>
+                    <td>@item.RightNumber</td>
+                    <td>@item.CreateTime.ToString("yyyy-MM-dd hh:mm:ss:ff")</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+<script>
+    function start() {
+        var closeSeconds = prompt('请输入投票时长');
+        if (parseInt(closeSeconds)) {
+              $.ajax({
+                  url: '/Jdly/StartVote',
+                  type: 'post',
+                  dataType:'json',
+                  data: {
+                      Id:@Model.JdlyId,
+                      closeSecondes: closeSeconds
+                  },
+                    success: function (res) {
+                        if (res.success) {
+                            window.location='/'
+                        }
+                    }
+                })
+        }
+    }
+    function clearUp() {
+        if (confirm("请确认危险操作")) {
+                $.ajax({
+                    url: '/Jdly/ClearUp',
+                    data: {
+                        Id:@Model.JdlyId
+                    },
+                    success: function (res) {
+                        if (res.success) {
+                            window.location='/'
+                        }
+                    }
+                })
+            }
+    }
+
+
+</script>

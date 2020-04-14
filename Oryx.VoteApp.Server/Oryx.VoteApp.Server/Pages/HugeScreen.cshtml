@@ -1,0 +1,514 @@
+﻿@page  "{voteId?}"
+@model Oryx.VoteApp.Server.Pages.HugeScreenModel
+@{
+    ViewData["Title"] = "HugeScreen";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>[@Model.VoteInfo.Name ] 投票现场</title>
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+    </environment>
+    <link href="https://cdn.bootcss.com/animate.css/3.5.2/animate.min.css" rel="stylesheet">
+    <link href="~/css/bootstrap.theme.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        body, html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 90%;
+        }
+
+        .flex-item-heading span {
+            color: white;
+        }
+
+        .flex-item {
+            text-align: center;
+        }
+
+        .flex {
+            flex-wrap: nowrap;
+        }
+
+        .progressBarNum {
+            font-size: 26px;
+            position: relative;
+            top: -32px;
+            left: 4px;
+        }
+
+        .customerProgressbar .progressBarNum {
+            text-shadow: 2px 2px 2px rgb(232,105,2);
+        }
+
+        .bossProgressbar .progressBarNum {
+            text-shadow: 2px 2px 2px rgb(61,31,1);
+        }
+
+        .progress-bar:last-child:before {
+            border-radius: 20px;
+        }
+
+        .vote-progress {
+            overflow: initial;
+        }
+
+        .progress-bar-warning {
+            background-color: rgb(204,51,153) !important;
+        }
+
+        span#txtDaojishi {
+            font-size: 49px;
+            color: white;
+            position: absolute;
+            right: 149px;
+        }
+
+        .progressTotalNum {
+            /* position: relative; */
+            /* top: -98px; */
+            color: white;
+            font-size: 25px;
+            text-shadow: 2px 2px 2px #0c84e4;
+            /*background-color: rgb(204,51,153) !important;*/
+        }
+
+        .flexItemTitle {
+            width: 200px;
+        }
+    </style>
+</head>
+@*<body style="padding:0;background:url('@Html.Raw("~/images/"+ Model.VoteInfo.VoteType+"_result.jpg")')">  *@
+<body style="padding:0;background:url('/images/@(Model.VoteInfo.VoteType)_result.jpg');background-size: 100% 100%; background-repeat:no-repeat">
+    @*<div class="btn-group btn-group-justified navbar-fixed-bottom   visible-xs">
+            <a href="/" class="btn btn-default">活动列表</a>
+            <a href="/Game/CreateVoting" class="btn btn-default">创建活动</a>
+        </div>*@
+    <div class="container body-content">
+        @*<h3 class="animated bounce" style="color:white;">@Model.VoteInfo.Name 投票现场 <span class="count">0</span></h3>*@
+        <span id="txtDaojishi" style="margin-left:100px;">
+
+        </span>
+        <div style=" ">
+            <div class="flex" style="margin-top: 16%;">
+                @{
+                    var voteTotal = Model.VoteLog.Sum(x => x.Value);
+                }
+                @for (int i = 0; i < Model.VoteInfo.VoteOptions.Count; i++)
+                {
+                    var percent = 0.0;
+                    var item = Model.VoteInfo.VoteOptions[i];
+                    var largeThan = false;
+                    var largeThanClass = "";
+                    <div class="animated  slideInLeft">
+                        <div class="progress vote-progress">
+                            @if (Model.VoteLog.ContainsKey(item.Key))
+                            {
+                                percent = Math.Round((double)Model.VoteLog[item.Key] / (double)voteTotal * 100);
+                                largeThan = Model.VoteLog.Any(x => x.Value > Model.VoteLog[item.Key]);
+                                if (!largeThan)
+                                {
+                                    largeThanClass = "progress-bar-warning";
+                                }
+                            }
+                            <div class="groupProgress bossProgressbar progress-bar vote-progress-bar "
+                                 role="progressbar"
+                                 data-txt="@item.Key"
+                                 data-percent="0"
+                                 aria-valuenow="60"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"
+                                 style="height:0;">
+                                <span class="progressBarNum">
+                                    @*0%*@
+                                    @*@(percent + "%")*@
+                                </span>
+                            </div>
+                            <div class="groupProgress customerProgressbar progress-bar vote-progress-bar @largeThanClass"
+                                 role="progressbar"
+                                 data-txt="@item.Key"
+                                 data-percent="@(percent)"
+                                 aria-valuenow="60"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"
+                                 style="height:@(percent+"%");">
+
+                                <span class="progressBarNum">
+                                    @(percent + "%")
+                                </span>
+                            </div>
+                        </div>
+                        <p class="flex-item">
+                            <img src="@item.Value?imageView2/1/w/200/h/200/q/75|imageslim" class="img-thumbnail" alt="@item.Key" />
+                        </p>
+                        <h4 class="flex-item">
+                            <span style="display:block;" class="flexItemTitle">@item.Key</span>
+                            <span style="display:block;" class="flexItemTitle">@(item.Description ?? "")</span>
+                            <span data-txt="@item.Key" class="progressTotalNum">
+                                @*@(percent + "%")*@
+                            </span>
+                        </h4>
+                    </div>
+                }
+            </div>
+            <div class="voteLogArea">
+                <div class="voteLogContainer">
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha384-K+ctZQ+LL8q6tP7I94W+qzQsfRV2a+AfHIi9k8z8l9ggpc8X+Ytst4yBo/hH+8Fk">
+        </script>
+        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                crossorigin="anonymous"
+                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
+        </script>
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
+    <script type="text/template" id="voteLog" class="animated fadeIn">
+        <div class="media">
+            <div class="media-left">
+                <a href="#">
+                    <img class="media-object" data-src="holder.js/64x64" alt="64x64" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PCEtLQpTb3VyY2UgVVJMOiBob2xkZXIuanMvNjR4NjQKQ3JlYXRlZCB3aXRoIEhvbGRlci5qcyAyLjYuMC4KTGVhcm4gbW9yZSBhdCBodHRwOi8vaG9sZGVyanMuY29tCihjKSAyMDEyLTIwMTUgSXZhbiBNYWxvcGluc2t5IC0gaHR0cDovL2ltc2t5LmNvCi0tPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PCFbQ0RBVEFbI2hvbGRlcl8xNjJhMDU5MzBkOSB0ZXh0IHsgZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQgfSBdXT48L3N0eWxlPjwvZGVmcz48ZyBpZD0iaG9sZGVyXzE2MmEwNTkzMGQ5Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIGZpbGw9IiNFRUVFRUUiLz48Zz48dGV4dCB4PSIxMy4xNzk2ODc1IiB5PSIzNi41Ij42NHg2NDwvdGV4dD48L2c+PC9nPjwvc3ZnPg==" data-holder-rendered="true" style="width: 64px; height: 64px;">
+                </a>
+            </div>
+            <div class="media-body">
+                用户{index} 向1号投票
+            </div>
+        </div>
+    </script>
+    <script src="https://unpkg.com/qiniu-js@2.1.2/dist/qiniu.min.js"></script>
+    <script>
+        var isEnable =@(Model.VoteInfo.IsEnable ? "true":"false");
+        var  timeToStop= Math.floor(((new Date() - Math.floor(@Model.VoteInfo.EnableStartTime)) / 1000))
+        var daojishi =@Model.VoteInfo.CloseSeconds- timeToStop;
+        daojishi *= 1000;
+        timer = setInterval(function () {
+            var timeshow = new Date().toLocaleString().replace(/^\.\d+Z$/g, '').replace(/\T/g, ' ')
+            var timeToHoure = (daojishi - 60 * 60 * 1000)
+            var timeToMiniutes = (daojishi - timeToHoure - 60 * 1000)
+            var timeToSeconds = daojishi - timeToHoure - timeToMiniutes
+
+            var t = daojishi
+            var seconds = Math.floor((t / 1000) % 60)
+            var minutes = Math.floor((t / 1000 / 60) % 60)
+            var hours = Math.floor((t / (1000 * 60 * 60)) % 24)
+            var days = Math.floor(t / (1000 * 60 * 60 * 24))
+
+            if (daojishi > 0 && isEnable) {
+                var txtSum="";
+                if (days>0) {
+                    txtSum += days + " 天 "
+                }
+                if (hours > 0) {
+                    txtSum += hours + " 时 "
+                }
+                if (minutes > 0) {
+                    txtSum += minutes + " 分 "
+                }
+                if (seconds >= 0) {
+                    txtSum += seconds + "秒"
+                }
+                if (seconds == 1) {
+                    setTimeout(function () {
+                        $('#txtDaojishi').text('')
+                    },1000)
+                }
+                $('#txtDaojishi').text(txtSum)
+            } else {
+            }
+            daojishi -= 1000;
+        }, 1000)
+    </script>
+    <script>
+        var socketlist = [];
+        var voteResultDic = {@Model.VoteInfo.Id: @(Model.VoteLogJson!=null?Html.Raw(Model.VoteLogJson) :Html.Raw("{}"))};
+        var voteCount = 0;
+        var socket;
+        var socket2;
+        var voteResult = {};
+        var buffResultData = @(Model.BuffResult!=null?Html.Raw(   Model.BuffResult ): Html.Raw("{}")) ;
+        var buffResult = {};
+        convertDataToBuffResult(buffResultData);
+        processBuffResult()
+          processVoteResult(voteResultDic)
+        processTotalNum();
+
+            function changerVoteData(value) {
+                if (value) {
+                    var jsonValue = JSON.parse(value);
+                    console.log(jsonValue);
+                     if (jsonValue.type == "addBuff") {
+                         convertDataToBuffResult(jsonValue);
+                         processBuffResult()
+                         processVoteResult(voteResult)
+                    } else {
+                        voteResult = jsonValue.globalVoteResultDic;
+                        processVoteResult(voteResult)
+                        var nickName = jsonValue.nickName;
+                        var avatar = jsonValue.avatar;
+                    }
+                }
+        }
+        function convertDataToBuffResult(currentData) {
+            Object.keys(currentData).forEach(function (item) {
+                var totalPercent = 0;
+                var currentObj = currentData[item];
+                Object.keys(currentObj).forEach(function (subItem) {
+                    totalPercent += currentObj[subItem];
+                });
+                if (totalPercent == '0addBuff')
+                    return;
+                if (!buffResult[item]) {
+                    buffResult[item] = parseFloat((totalPercent).toFixed(2));
+                } else {
+                    buffResult[item] += parseFloat( (totalPercent).toFixed(2));
+                }
+            });
+         }
+
+        function processVoteResult(voteResult) {
+
+            for (var valueItemIndex in voteResult) {
+                var valueItem = voteResult;
+                voteCount = 0
+                Object.keys(valueItem).forEach(function (_valueItemKey) {
+                    var voteResultItem = valueItem[_valueItemKey];
+                    for (var subIndex = 0; subIndex < voteResultItem.length; subIndex++) {
+                        var subImte = voteResultItem[subIndex];
+                        var percent = subImte.voteSum / voteResultItem.map(function (item) { return item.voteSum }).reduce(function (item, acc) {
+                            return item + acc;
+                        });
+                        var buffResultSum = 0;
+                        //for (var buffResultIndex in buffResult) {
+                        //    if (buffResultIndex == 'type')
+                        //        continue;
+                        //    buffResultSum += buffResult[buffResultIndex];
+                        //}
+                        //percent = percent/2+ (buffResultSum/100/voteResultItem.length)/2;
+                        voteCount += subImte.voteSum;
+                        percent = percent / 2;
+                        var bufferPercent = $('[data-txt="' + subImte.voteOption + '"].customerProgressbar').siblings('.progress-bar').data('percent');
+                       bufferPercentNum = bufferPercent / 100;
+                        //var totalNum = ((percent + bufferPercentNum)*100).toFixed(1)+'%'
+                        //$('.progressTotalNum').text(totalNum);
+                        //$('[data-txt="' + subImte.voteOption + '"].customerProgressbar .progressTotalNum').text(totalNum)
+                        $('[data-txt="' + subImte.voteOption + '"].customerProgressbar .progressBarNum').text(((percent ) * 100).toFixed(1) + "%")
+                        $('[data-txt="' + subImte.voteOption + '"].customerProgressbar').data('percent', percent*100)
+                        $('[data-txt="' + subImte.voteOption + '"].customerProgressbar').height((percent - bufferPercentNum) * 100 + "%")
+                    }
+                })
+                $('.voteCount').text(voteCount);
+            }
+        }
+
+        function processTotalNum() {
+            $('.bossProgressbar').each(function () {
+                var option = $(this).data('txt');
+                var totalNum = 0;
+                $('[data-txt="' + option + '"]').each(function () {
+                    var percent = parseFloat($(this).data('percent')) || 0;
+                    totalNum += percent;
+                })
+                if (totalNum) {
+                    $('[data-txt="' + option + '"].progressTotalNum').text(totalNum.toFixed(1) + '%')
+                } else {
+                    $('[data-txt="' + option + '"].progressTotalNum').text('')
+                }
+            })
+        }
+
+        function processBuffResult() {
+            for (var itemKey in buffResult) {
+                var currentPercent = buffResult[itemKey];
+                var oldPercent = $('[data-txt="' + itemKey + '"].bossProgressbar').data('percent')
+                var percent = 0;
+                if (oldPercent) {
+                    percent = currentPercent/2 + oldPercent/2;
+                    $('[data-txt="' + itemKey + '"].bossProgressbar .progressBarNum').text((percent).toFixed(1) + "%")
+                } else {
+                    percent = currentPercent/2;
+                    $('[data-txt="' + itemKey + '"].bossProgressbar .progressBarNum').text((currentPercent).toFixed(1) + "%")
+                }
+                $('[data-txt="' + itemKey + '"].bossProgressbar .progressBarNum').text((percent).toFixed(1) + "%")
+                $('[data-txt="' + itemKey + '"].bossProgressbar').data('percent', percent.toFixed(1))
+                $('[data-txt="' + itemKey + '"].bossProgressbar').height(percent.toFixed(1) + "%")
+            }
+            var percentList = [];
+            //$('.groupProgress').each(function () {
+            //    percentList.push(parseInt($(this).data('percent')))
+            //})
+            //$('.groupProgress').each(function () {
+            //    var currentPercent = Math.round( $(this).data('percent') || buffResult[$(this).data('txt')]);
+            //    var hasLargerThan = percentList.some(function (percentItem) {
+            //        return percentItem > currentPercent
+            //    })
+            //    if (hasLargerThan) {
+            //        $(this).removeClass('progress-bar-warning')
+            //    } else {
+            //        $(this).addClass('progress-bar-warning')
+            //    }
+            //})
+        }
+        function CreateWebSocket() {
+                socket = new WebSocket((window.location.protocol.indexOf('https')>-1?"wss://":"ws://") + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=voteResult");
+                socketlist.push(socket);
+                socket.onopen = function (res) {
+                    console.log(res);
+                }
+
+            socket.onmessage = function (res) {
+                console.log(res.data);
+                changerVoteData(res.data);
+            }
+
+            socket.onerror = function (res) {
+                console.log(res);
+            }
+
+            socket.onclose = function (res) {
+                setTimeout(function () {
+                    //socket = new WebSocket("ws://" + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=voteResult");
+                    //socket = new WebSocket( (window.location.protocol.indexOf('https')>-1?"wss://":"ws://") + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=voteResult");
+                    CreateWebSocket();
+                }, 3000)
+            }
+
+            function sendMsg() {
+                setInterval(function () {
+                    socket.send("test data");
+                }, 3000);
+
+            }
+            setTimeout(sendMsg, 5000);
+        }
+        function CreateWebSocke2() {
+            socket2 = new WebSocket((window.location.protocol.indexOf('https') > -1 ? "wss://" : "ws://") + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=userSocket");
+            //socketlist.push(socket);
+            socket2.onopen = function (res) {
+                console.log(res);
+            }
+
+            socket2.onmessage = function (res) {
+                console.log(res.data);
+                var resultObj = JSON.parse(res.data);
+        //        _this.globalData.endTimeStamp = resultObj.timestamp;
+                switch (resultObj.cmd) {
+                    case 'startVote':
+                        break;
+                    case 'endVote':
+                        break;
+                    case 'nextVote':
+                        $('#txtDaojishi').text('停止')
+                        break;
+                }
+            }
+
+            socket2.onerror = function (res) {
+                console.log(res);
+            }
+
+            socket2.onclose = function (res) {
+                setTimeout(function () {
+                    //socket = new WebSocket("ws://" + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=voteResult");
+                    //socket = new WebSocket( (window.location.protocol.indexOf('https')>-1?"wss://":"ws://") + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=voteResult");
+                    CreateWebSocket2();
+                }, 3000)
+            }
+
+            function sendMsg() {
+                setInterval(function () {
+                    socket.send("test data");
+                    socket2.send("test data");
+                }, 3000);
+
+            }
+            setTimeout(sendMsg, 5000);
+        }
+        for (var i = 0; i < 1; i++) {
+            CreateWebSocket();
+            CreateWebSocke2();
+        }
+        window.onunload = function () {
+            for (var i = 0; i < socketlist.length; i++) {
+                socketlist[i].close();
+            }
+        }
+            $(document).ready(function () {
+                $('#btnReset').click(function () {
+                     $.ajax({
+                    url: '/vote/resetVote',
+                    dataType: 'json',
+                    data: {
+                       Id:'@Model.VoteInfo.Id'
+                    },
+                    type: 'post',
+                    success: function (res) {
+                        if (res.success) {
+                            window.location = window.location;
+                            $('.alert-success').slideUp(300).delay(800).fadeIn(400);
+                        } else {
+                            $('.alert-error').slideUp(300).delay(800).fadeIn(400);
+                        }
+                    },
+                    error: function () {
+                        $('.alert-error').show().delay(3000).hide();
+                    }
+                })
+                })
+            $('#btnStart').click(function () {
+                $.ajax({
+                    url: '/vote/StartVote',
+                    data: {
+                       Id:'@Model.VoteInfo.Id'
+                    },
+                    dataType: 'json',
+                    type: 'post',
+                    success: function (res) {
+                        if (res.success) {
+                            $('.alert-success').slideUp(300).delay(800).fadeIn(400);
+                        } else {
+                            $('.alert-error').slideUp(300).delay(800).fadeIn(400);
+                        }
+                    },
+                    error: function () {
+                        $('.alert-error').slideUp(300).delay(800).fadeIn(400);
+                    }
+                })
+            })
+        })
+    </script>
+</body>
+</html>
+

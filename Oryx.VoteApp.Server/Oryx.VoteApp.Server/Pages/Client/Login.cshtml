@@ -1,0 +1,41 @@
+﻿@page
+@model Oryx.VoteApp.Server.Pages.Client.LoginModel
+@{
+    ViewData["Title"] = "Login";
+    Layout = "_ClientLayout.cshtml";
+    var currentTheme = "https://mioto.milbit.com//voteapp/Voting_Cover.png";
+}
+<style>
+    form {
+        margin-top: 65%;
+    }
+
+    .section {
+        width: 290px;
+        margin: 0 auto;
+    }
+
+    input {
+        border: 1px solid #ececf2;
+        height: 50px;
+        border-radius: 10px;
+        padding: 2.5px 15px;
+        margin: 10px auto;
+        background-color: white;
+    }
+
+    .logo {
+        text-align: center;
+    }
+</style>
+<div class="logo container" style='background-image:url(@currentTheme)'>
+    <form>
+        <div class="section">
+            <input name="id" placeholder="姓名" />
+            <input name="password" placeholder="编号" type='password' />
+        </div>
+        <div class="btn-area">
+            <button type="submit" class='btn'>立即参与</button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,174 @@
+/* pages/vote/vote.wxss */
+
+.container {
+  padding: 0;
+}
+
+.loadingContainer {
+  display: flex;
+}
+
+.loadingContainer image {
+  width: 200rpx;
+  height: 200rpx;
+  margin: 200rpx auto;
+}
+
+.options {
+  width: 50%;
+  overflow: hidden;
+  position: relative;
+  margin-top: 30rpx;
+  display: inline-block;
+}
+
+.options text {
+  display: inline-block;
+  /* width: 50%; */
+  max-width: 240rpx;
+  max-height: 60rpx;
+  position: relative;
+  left: 34px;
+  color: #333;
+  overflow: hidden;
+}
+
+.option {
+  width: 300rpx;
+  height: 225rpx;
+  margin-left: 20rpx;
+}
+
+checkbox {
+  /* position: absolute;
+  left: 20rpx;
+  bottom: 10rpx; */
+}
+
+.warp {
+  width: 690rpx;
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 auto;
+  height: 800rpx;
+}
+
+.checkeIcon {
+  width: 20rpx;
+  height: 20rpx;
+  background: red;
+}
+
+.logo {
+  /* height: 200rpx; */
+  border-bottom: 1rpx solid #ececf2;
+  text-align: center;
+  width: 100%;
+}
+
+.logo text.titleContainer {
+  margin-top: 10rpx;
+  display: inline-block;
+  width: 100%;
+  color: white;
+  text-align: left;
+  padding-left: 20rpx;
+}
+
+.right {
+  float: right;
+  width: 130rpx;
+  height: 130rpx;
+  margin-top: 10rpx;
+  text-align: center;
+  border-left: 1rpx solid #ececf2;
+}
+
+.status {
+  font-size: 30rpx;
+  color: white;
+}
+
+.number {
+  font-size: 50rpx;
+  color: white;
+}
+
+/* button {
+  width: 300rpx;
+  font-size: 32rpx;
+  background-color: #4169e1;
+  color: #fff;
+  margin-top: 20rpx;
+} */
+
+checkbox-group {
+  width: 100%;
+}
+
+checkbox .wx-checkbox-input {
+  border-radius: 50%;
+  width: 60rpx;
+  height: 60rpx;
+  background-color: white;
+  /* background-color: rgba(103, 103, 103, 0.7); */
+}
+
+checkbox .wx-checkbox-input.wx-checkbox-input-checked {
+  /* border: none;
+  background: red;   */
+  border: 1px solid rgb(45, 159, 44);
+}
+
+checkbox .wx-checkbox-input.wx-checkbox-input-checked::before {
+  position: absolute;
+  border-radius: 50%;
+  border: none;
+  width: 40rpx;
+  height: 40rpx;
+  line-height: 40rpx;
+  text-align: center;
+  font-size: 50rpx;
+  /* color: #fff; */
+  color: rgb(45, 159, 44);
+  background: transparent;
+  /* background-color: white; */
+  transform: translate(-50%, -50%) scale(1);
+  -webkit-transform: translate(-50%, -50%) scale(1);
+}
+
+.optionCbx {
+  position: relative;
+  /* top: -90rpx; */
+  left: 110rpx;
+}
+
+.optTxt {
+  color: black !important;
+  font-weight: 600;
+}
+
+text.lostvote {
+  width: 100%;
+  display: block;
+  margin-top: 200rpx;
+  font-size: 2rem;
+  color: tomato;
+}
+
+.voteTimeout {
+  text-align: center;
+}
+
+.titleContainer text {
+  display: block;
+}
+
+.titleContainer .default {
+  color: white;
+}
+
+.warning {
+  color: white;
+  display: inline-block;
+}

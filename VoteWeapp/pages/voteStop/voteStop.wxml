@@ -1,0 +1,10 @@
+<view class='container' style='background-image:url({{bgImg}})'>
+  <view class='voteTimeout'>
+    <!-- <text class='lostvote'>抱歉, 投票已经关闭, 请等待开启 
+    </text> -->
+    <image src='/img/timeout.png'></image>
+    <!-- <text class='lostvote'>Sorry the voting time is up
+    Please check with the result afterwards
+    </text> -->
+  </view>
+</view>

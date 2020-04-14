@@ -1,0 +1,47 @@
+/**app.wxss**/
+
+page {
+  height: 100%;
+  margin: 0 !important;
+}
+
+.btnImg {
+  height: 100rpx;
+  width: 320rpx;
+  margin-bottom: 100rpx;
+}
+
+.container {
+  margin: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 100rpx 0;
+  box-sizing: border-box;
+  background-repeat: no-repeat;
+  background-size: 101% 108%;
+}
+
+button {
+  width: 300rpx;
+  height: 150rpx;
+  font-size: 54rpx;
+  background-color: transparent !important;
+  color: #000;
+  background-image: url(https://mioto.milbit.com/voteapp/defaultBtn.png);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+button::after {
+  border: none;
+}
+
+.btnAction {
+  width: 600rpx;
+  height: 150rpx;
+  font-size: 40rpx;
+  line-height: 130rpx;
+}

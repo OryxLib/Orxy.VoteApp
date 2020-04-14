@@ -1,0 +1,22 @@
+﻿@page
+@model Oryx.VoteApp.Server.Pages.Client.ThanksModel
+@{
+    ViewData["Title"] = "Thanks";
+    Layout = "_ClientLayout.cshtml";
+    var currentTheme = "https://mioto.milbit.com//voteapp/Voting_Cover.png";
+}
+<style>
+    span {
+        width: 100%;
+        display: block;
+        font-size: 36px;
+        color: #000;
+    }
+</style>
+<div class='container' style='background-image:url(@currentTheme)'>
+    <div style='margin-top:225px;'>
+        <span>Thank you</span>
+        <span>for your participation</span>
+    </div>
+</div>
+

@@ -1,0 +1,105 @@
+﻿@page "{voteId?}"
+@model ValueTestMysql.Pages.VoteDetailModel
+@{
+    //ViewData["Title"] = "VoteDetail";
+}
+
+<h2>@Model.VoteInfo.Name</h2>
+
+<div>
+    开启时间:
+    @Model.VoteInfo.EnableTime
+</div>
+
+<div>
+    <div class="flex">
+        @for (int i = 0; i < Model.VoteInfo.VoteOptions.Count; i++)
+        {
+            var item = Model.VoteInfo.VoteOptions[i];
+            <div class="flex-item">
+                <h4 class="flex-item-heading">
+                    <span>@item.Key</span>
+                </h4>
+                <p class="flex-item-text">
+                    <img src="@item.Value" class="img-thumbnail" alt="@item.Key" style="width:200px;" />
+                </p>
+                <span>
+                    投票结果: <span class="badge" id="option@(item.Id)" data-txt="@item.Key">
+                        @{
+                            if (Model.VoteLog.ContainsKey(item.Key))
+                            {
+                                <span>@Model.VoteLog[item.Key]</span>
+                            }
+                            else
+                            {
+                                <span> 0 </span>
+                            }
+                        }
+
+                    </span>
+                </span>
+            </div>
+        }
+    </div>
+</div>
+
+<script>
+    var socketlist = [];
+    var voteResultDic = {};
+    function changerVoteData(value) {
+        if (value) {
+            var jsonValue = JSON.parse(value);
+            for (var valueItemIndex in jsonValue) {
+                var valueItem = jsonValue[valueItemIndex];
+                for (var subIndex = 0; subIndex < valueItem.length; subIndex++) {
+                    var subImte = valueItem[subIndex];
+                    $('span[data-txt="' + subImte.voteOption + '"]').text(subImte.voteSum)
+                }
+            }
+
+            //console.log(value);
+            //voteResultDic[value.id]
+        }
+    }
+    function CreateWebSocket() {
+        var socket = new WebSocket("ws://" + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=voteResult");
+        socketlist.push(socket);
+        socket.onopen = function (res) {
+            console.log(res);
+        }
+
+        socket.onmessage = function (res) {
+            console.log(res.data);
+            changerVoteData(res.data);
+        }
+
+        socket.onerror = function (res) {
+            console.log(res);
+        }
+
+        socket.onclose = function (res) {
+            setTimeout(function () {
+                socket = new WebSocket("ws://" + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=voteResult");
+            }, 2000)
+        }
+
+        function sendMsg() {
+            setInterval(function () {
+                socket.send("test data");
+            }, 3000);
+
+        }
+        setTimeout(sendMsg, 5000);
+    }
+
+    for (var i = 0; i < 1; i++) {
+        CreateWebSocket();
+    }
+
+    window.onunload = function () {
+        for (var i = 0; i < socketlist.length; i++) {
+            socketlist[i].close();
+        }
+    }
+
+</script>

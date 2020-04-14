@@ -1,0 +1,23 @@
+/* pages/login/login.wxss */
+
+.formMain {
+  margin-top: 400rpx;
+}
+
+.section {
+  width: 580rpx;
+  margin: 0 auto;
+}
+
+input {
+  border: 1rpx solid #ececf2;
+  height: 100rpx;
+  border-radius: 20rpx;
+  padding: 5rpx 30rpx;
+  margin: 20rpx auto;
+  background-color: white;
+}
+
+.logo {
+  text-align: center;
+}

@@ -1,0 +1,35 @@
+﻿html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    margin: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 111px 0;
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+    background-size: 101% 108%;
+    background-position-x: -3px;
+}
+
+
+
+button {
+    width: 150px;
+    height: 75px;
+    font-size: 27px;
+    background-color: transparent;
+    color: #000;
+    background-image: url(https://mioto.milbit.com//voteapp/defaultBtn.png);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    border: 0;
+    margin: 0 auto;
+    display: block;
+}

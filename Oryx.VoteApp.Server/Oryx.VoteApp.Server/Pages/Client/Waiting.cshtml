@@ -1,0 +1,149 @@
+﻿@page
+@model Oryx.VoteApp.Server.Pages.Client.WaitingModel
+@{
+    ViewData["Title"] = "Waiting";
+    Layout = "_ClientLayout.cshtml";
+    var currentTheme = "https://mioto.milbit.com//voteapp/Voting_Cover.png";
+}
+<style>
+    .txtTitle {
+        margin-top: 250px;
+    }
+</style>
+<div id="waitingThanks" class='container' style='background-image:url(@currentTheme)'>
+    <!-- <image src='/img/logo.png' mode='aspectFit'></image> -->
+
+    <div class='txtTitle'>活动还未开启 , 请等待</div>
+    <!-- <div>倒计时</div>
+    <div>{{timeStampDate}}</div> -->
+    <div class="btn-area" v-if="isEnable">
+        <button type="button" @@click='gotoVote'>立即参与</button>
+    </div>
+    <div class="btn-area" v-else-if='!isEnable&&isConnected'>
+        <button type="button" disabled='diabled'>请等待...</button>
+    </div>
+    <div class='btn-area' v-else>
+        <button type="button" @@click='gotoRefresh'>刷新</button>
+    </div>
+</div>
+
+@section Scripts{
+    <script>
+        var timer = 0;
+        new Vue({
+            el: '#waitingThanks',
+            /**
+             * 页面的初始数据
+             */
+            data: {
+                timeStampStart: 0,
+                timeStamp: 0,
+                timeStampDate: 0,
+                isEnable: true,
+                isConnected: true,
+                //bgImg: app.globalbgImg
+            },
+
+            mounted: function () {
+                this.timeStampStart = new Date() + parseInt(window.location.search.split('&')[0].split('=')[1]);
+                this.timeStamp = 5000// parseInt(options.timeStamp)
+
+                var _this = this;
+                timer = setInterval(function () {
+                    var timeshow = new Date().toLocaleString().replace(/^\.\d+Z$/g, '').replace(/\T/g, ' ')
+                    var timeToHoure = (_this.timeStamp - 60 * 60 * 1000)
+                    var timeToMiniutes = (_this.timeStamp - timeToHoure - 60 * 1000)
+                    var timeToSeconds = _this.timeStamp - timeToHoure - timeToMiniutes
+
+                    var t = _this.timeStamp
+                    var seconds = Math.floor((t / 1000) % 60)
+                    var minutes = Math.floor((t / 1000 / 60) % 60)
+                    var hours = Math.floor((t / (1000 * 60 * 60)) % 24)
+                    var days = Math.floor(t / (1000 * 60 * 60 * 24))
+
+                    if (_this.timeStamp > 0) {
+                        _this.timeStamp = _this.timeStamp - 1000,
+                            _this.timeStampStart = timeshow,
+                            _this.timeStampDate = days + " 天 " + hours + " 时 " + minutes + " 分 " + seconds
+                    } else {
+                        _this.isEnable = true
+                    }
+                }, 1000)
+                this.gotoRefresh();
+            },
+            methods: {
+                startGetMsg: function () {
+                    var _this = this;
+                    var socket = new WebSocket((window.location.protocol.indexOf('https') > -1 ? "wss://" : "ws://") + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=voteResult");
+                    socketlist.push(socket);
+                    socket.onopen = function (res) {
+                        console.log(res);
+                    }
+
+                    socket.onmessage = function (res) {
+                        console.log('收到服务器内容：' + res.data)
+                        var resultObj = JSON.parse(res.data);
+                        globalendTimeStamp = resultObj.timestamp + 30000;
+                        switch (resultObj.cmd) {
+                            case 'startVote':
+                                _this.isEnable = true
+                                break;
+                        }
+                    }
+
+                    socket.onerror = function (res) {
+                        _this.isConnected = true
+                    }
+
+                    socket.onclose = function (res) {
+                        _this.isConnected = true
+                    }
+
+                    //wx.connectSocket({
+                    //    url: 'wss://voteapp.oryxl.com/ws?key=userSocket' || 'ws://localhost:19737/ws?key=userSocket'
+                    //})
+                    //wx.onSocketOpen(function (res) {
+                    //    _this.isConnected = true
+                    //})
+                    //wx.onSocketMessage(function (res) {
+                    //    console.log('收到服务器内容：' + res.data)
+                    //    var resultObj = JSON.parse(res.data);
+                    //    globalendTimeStamp = resultObj.timestamp + 30000;
+                    //    switch (resultObj.cmd) {
+                    //        case 'startVote':
+                    //            _this.isEnable = true
+                    //            break;
+                    //    }
+                    //})
+                    //wx.onSocketError(function (res) {
+                    //    _this.isConnected = false
+                    //})
+                    //wx.onSocketClose(function (res) {
+                    //    _this.isConnected = false
+                    //})
+                },
+                gotoVote: function () {
+                    window.location = '/client/vote'
+                },
+                gotoRefresh: function () {
+                    var _this = this;
+                    $.ajax({
+                        url: '/vote/checkenable',
+                        success: function (res) {
+                            var resObj = res;
+                            if (resObj.success) {
+                                if (resObj.isEnable) {
+                                    _this.isEnable = true
+                                    globalendTimeStamp = resObj.enableTime + 30000;
+                                }
+                                else {
+                                    _this.startGetMsg();
+                                }
+                            }
+                        }
+                    })
+                }
+            }
+        })
+    </script>
+}

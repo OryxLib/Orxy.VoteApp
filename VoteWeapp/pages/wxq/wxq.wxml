@@ -1,0 +1,25 @@
+<!--pages/vote/vote.wxml-->
+<view class='container' style='background-image:url({{bgImg}})'>
+
+  <form class='formMain'>
+    <view class="section">
+      <picker bindchange="bindPickerChange" value="{{pickIndex}}" range="{{pickarray}}">
+        <view class="picker">
+          当前选择发送：{{pickarray[pickIndex]}}
+        </view>
+      </picker>
+      <block wx:if="{{pickIndex==0}}">
+        <textarea placeholder="" bindinput='textInput' value="{{msgData}}" auto-focus style='background-color:white' />
+      </block>
+      <block wx:if="{{pickIndex==1}}">
+        <image wx:if="{{previewImgSrc}}" src='{{previewImgSrc}}'></image>
+        <button bindtap="takePhoto" class='btn btnAction'>选择照片 | Check Img</button>
+      </block>
+    </view>
+    <view class="btn-area">
+      <button bindtap='postMsg' class='btn btnAction'>发送 | Send</button>
+      <button bindtap='gobackVote' class='btn btnAction'>返回 | Go Bakc</button>
+    </view>
+  </form>
+
+</view>

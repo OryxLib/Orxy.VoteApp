@@ -1,0 +1,254 @@
+﻿@page
+@model Oryx.VoteApp.Server.Pages.JDLY.AddModel
+@{
+    ViewData["Title"] = "Add";
+    //Layout = null;
+}
+
+<div id="appVotingCreate">
+    <form class="form-horizontal" id="appVotingCreate">
+        <fieldset>
+            <legend>创建投票</legend>
+            <div class="form-group">
+                <div class="col-lg-12">
+                    <input type="text" class="form-control" placeholder="请填写问题" v-model="Name">
+                </div>
+            </div>
+            @*<div class="form-group">
+                    <div class="col-lg-12">
+                        <input type="datetime-local" class="form-control" placeholder="开始时间" v-model="EnableTime">
+                    </div>
+                </div>*@
+            <div class="form-group">
+                <div class="col-lg-12">
+                    <input type="text" class="form-control" placeholder="投票时长" v-model="CloseSeconds">(秒)
+                </div>
+            </div>
+            @*<div class="form-group">
+                    <div class="col-lg-12">
+                        <label>
+                            <input type="checkbox" v-model="ShouldLogin" />
+                            是否显示登录
+                        </label>
+                    </div>
+                </div>*@
+            @*<div class="form-group">
+                    <div class="col-lg-12">
+                        <select class="form-control" id="VoteType" v-model="VoteType">
+                            <option>CostumeVoting</option>
+                            <option>GuessWinnerVoting</option>
+                            <option>Voting</option>
+                        </select>
+                    </div>
+                </div>*@
+            <ul class="list-group">
+                <li class="list-group-item" v-for="(item ,index) in VoteOptions">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <div class="form-group">
+                                <div class="col-xs-12">
+                                    <input class="form-control input-lg col-md-11" type="text" v-model="item.Name" placeholder="姓名">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-xs-12">
+                                    <input class="form-control input-lg col-md-11" type="text" v-model="item.Answer" placeholder="Correct Option">
+                                </div>
+                                <div class="col-xs-12">
+                                    <input class="form-control input-lg col-md-11" type="text" v-model="item.Option1" placeholder="Option A">
+                                </div>
+                                <div class="col-xs-12">
+                                    <input class="form-control input-lg col-md-11" type="text" v-model="item.Option2" placeholder="Option B">
+                                </div>
+                                <div class="col-xs-12">
+                                    <input class="form-control input-lg col-md-11" type="text" v-model="item.Option3" placeholder="Option C">
+                                </div>
+                                <div class="col-xs-12">
+                                    <input class="form-control input-lg col-md-11" type="text" v-model="item.Option4" placeholder="Option D">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body imgContent">
+                            <img style="width:200px;" v-bind:src='item.ImgUrl' />
+                            <div class="progress progress-striped active ">
+                                <div class="progress-bar" :style="'width:'+item.percent+'%'"></div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-xs-6">
+                                    <label v-bind:for="'fileSelector'+index">
+                                        <span class="btn btn-primary text-center">
+                                            上传图片
+                                        </span>
+                                        <input type="file" multiple :name="'fileSelector'+index" v-bind:id="'fileSelector'+index" value="" v-on:change="addImage(index,$event)" v-bind:data-index="index" style="display:none;" />
+                                    </label>
+                                </div>
+                                <div class="col-xs-6 text-right">
+                                    <button class="btn btn-default" type="button" v-on:click="removeOption(index)">删除</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+            <button class="btn btn-default  btn-lg btn-block" type="button" v-on:click="addOption"><span class="glyphicon glyphicon-plus"></span></button>
+            <div class="form-group">
+                <div class="col-lg-10 " style="margin-top:100px;">
+                    <button type="button" class="btn btn-primary" v-on:click="submitVote">确认提交</button>
+                </div>
+            </div>
+        </fieldset>
+        <div v-if="isLoading" class="loading">
+            <img src="~/images/loading.gif" />
+        </div>
+    </form>
+</div>
+
+@section scripts{
+    <script>
+
+        new Vue({
+            el: '#appVotingCreate',
+            data: {
+                Name: '',
+                VoteOptions: [
+                    {
+                        Name: '',
+                        Answer: '',
+                        ImgUrl: '/images/defaultheader.jpg',
+                        fileBlob: null,
+                        Option1: '',
+                        Option2: '',
+                        Option3: '',
+                        Option4: ''
+                    }
+                ],
+                isLoading: false,
+                CloseSeconds: 60,
+                //VoteType: '',
+                //ShouldLogin: false
+            },
+            methods: {
+                addOption: function () {
+                    this.VoteOptions.push({
+                        Name: '',
+                        Answer: '',
+                        ImgUrl: '/images/defaultheader.jpg',
+                        fileBlob: null,
+                        Option1: '',
+                        Option2: '',
+                        Option3: '',
+                        Option4: ''
+                    })
+                },
+                removeOption: function (index) {
+                    this.VoteOptions.splice(index, 1);
+                },
+                addImage: function (index, e) {
+                    var blob = e.target.files[0];
+                    this.VoteOptions[index].fileBlob = blob;
+                    var _this = this;
+                    converToBase64(blob, function (dataUrl) {
+                        _this.VoteOptions[index].ImgUrl = dataUrl
+                    })
+                },
+                removeImage: function () { },
+                uploadImage: function () { },
+                submitVote: function () {
+                    this.isLoading = true;
+                    //var baseUrl = 'http://p5gq86skt.bkt.clouddn.com';
+                    var baseUrl = 'https://mioto.milbit.com';
+                    var _this = this;
+                    var uploadLength = this.VoteOptions.length;
+                    this.VoteOptions.forEach(function (item, index, arr) {
+                        if (!item.fileBlob) {
+                            return;
+                        }
+                        UploadFile({
+                            blob: item.fileBlob,
+                            name: new Date() - 0 + ".jpg",
+                            next: function (res) {
+                                item.percent = res.total.percent;
+                                Vue.set(arr, index, item)
+                            },
+                            error: function (res) {
+                                console.log(res)
+                            },
+                            complete: function (res) {
+                                item.ImgUrl = baseUrl + "/" + res.key
+                                if (--uploadLength == 0) {
+                                    _this.createVote();
+                                }
+                            }
+                        })
+                    })
+                },
+                createVote: function () {
+                    this.$http.post("/Jdly/AddPost", {
+                        Options: this.VoteOptions,
+                        CloseSeconds: this.CloseSeconds
+                    }, {
+                            headers: {
+                                'Content-Type': 'multipart/form-data'
+                            }
+                        }).then(function (res) {
+                            if (res.data.result) {
+                                alert("添加成功")
+                                window.location = '/';
+                                this.Name = '';
+                                this.VoteOptions = [
+                                    {
+                                        Name: '',
+                                        Answer: '',
+                                        ImgUrl: '/images/defaultheader.jpg',
+                                        fileBlob: null,
+                                        Option1: '',
+                                        Option2: '',
+                                        Option3: '',
+                                        Option4: ''
+                                    }
+                                ];
+                                this.isLoading = false;
+                            }
+                        }, err => {
+                            console.log(err)
+                        })
+                }
+            }
+        })
+
+        function converToBase64(file, cb) {
+            var fileReader = new FileReader();
+            fileReader.onload = function (e) {
+                cb && cb(e.target.result)
+            }
+            fileReader.readAsDataURL(file);
+        }
+
+        function UploadFile(file) {
+            var token = '';
+            $.ajax({
+                url: "/Game/GetToken",
+                dataType: "json",
+                type: "get",
+                async: false,
+                success: function (res) {
+                    token = res.token;
+                }
+            })
+            var observer = qiniu.upload(file.blob, file.name, token, null, {
+                useCdnDomain: true,
+                region: qiniu.region.z1
+            });
+            observer.subscribeAction({
+                next: file.next,
+                error: file.error,
+                complete: file.complete
+            })
+        }
+    </script>
+}
+
+
+

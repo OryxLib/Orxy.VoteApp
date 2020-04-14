@@ -1,0 +1,349 @@
+﻿@page
+@model Oryx.VoteApp.Server.Pages.Client.VoteModel
+@{
+    ViewData["Title"] = "Vote";
+    Layout = "_ClientLayout.cshtml";
+    var currentTheme = "https://mioto.milbit.com//voteapp/Voting_Cover.png";
+}
+<style>
+    .container {
+        padding: 0;
+    }
+
+    .loadingContainer {
+        display: flex;
+    }
+
+        .loadingContainer img {
+            width: 100px;
+            height: 100px;
+            margin: 100px auto;
+        }
+
+    .options {
+        width: 50%;
+        overflow: hidden;
+        position: relative;
+        margin-top: 15px;
+        display: inline-block;
+    }
+
+        .options label {
+            position: absolute;
+            top: 110px;
+            left: 16px;
+            height: 30px;
+            width: 30px;
+            z-index: 36;
+        }
+
+    .option {
+        width: 150px;
+        height: 150px;
+        margin-left: 10px;
+    }
+
+    checkbox {
+        /* position: absolute;
+      left: 20rpx;
+      bottom: 10rpx; */
+    }
+
+    .warp {
+        width: 345px;
+        display: flex;
+        flex-wrap: wrap;
+        margin: 0 auto;
+    }
+
+    .checkeIcon {
+        width: 10px;
+        height: 10px;
+        background: red;
+    }
+
+    .logo {
+        height: 75px;
+        border-bottom: 1px solid #ececf2;
+        text-align: center;
+    }
+
+        .logo span {
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+    .right {
+        float: right;
+        width: 65px;
+        height: 65px;
+        margin-top: 5px;
+        text-align: center;
+        border-left: 1px solid #ececf2;
+    }
+
+    .status {
+        font-size: 15px;
+        color: white;
+    }
+
+    .number {
+        font-size: 25px;
+        color: white;
+    }
+
+    checkbox-group {
+        width: 100%;
+    }
+
+    checkbox .wx-checkbox-input {
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        background-color: rgba(103, 103, 103, 0.7);
+    }
+
+        checkbox .wx-checkbox-input.wx-checkbox-input-checked {
+            /* border: none;
+      background: red;   */
+        }
+
+    /*checkbox .wx-checkbox-input.wx-checkbox-input-checked::before {
+                position: absolute;
+                border-radius: 50%;
+                border: none;
+                width: 20px;
+                height: 20px;
+                line-height: 20px;
+                text-align: center;
+                font-size: 15px;
+                color: #fff;
+                background: transparent;
+                transform: translate(-50%, -50%) scale(1);
+                -webkit-transform: translate(-50%, -50%) scale(1);
+            }*/
+
+    .optionCbx {
+        /*position: relative;
+        top: -45px;
+        left: 12px;
+        display: none;*/
+    }
+
+    .optionInput {
+        display: none;
+    }
+
+        .optionInput ~ span.optionCbx {
+            font-family: 'Glyphicons Halflings';
+            width: 30px;
+            height: 30px;
+            -moz-border-radius: 15px;
+            -webkit-border-radius: 15px;
+            border-radius: 15px;
+            background-color: white;
+            display: inline-block;
+            box-sizing: border-box;
+            background-color: rgba(103, 103, 103, 0.7);
+        }
+
+        .optionInput:checked ~ span:before {
+            content: "\e013";
+            top: 6px;
+            position: relative;
+            left: 8px;
+            color: white;
+        }
+
+
+    .optTxt {
+        color: white;
+        font-size: 20px;
+        margin-left: 20px;
+    }
+
+    span.lostvote {
+        width: 100%;
+        display: block;
+        margin-top: 100px;
+        font-size: 2rem;
+        color: tomato;
+    }
+
+    .voteTimeout {
+        text-align: center;
+    }
+
+    .titleContainer span {
+        display: block;
+    }
+
+    .titleContainer .default {
+        color: white;
+    }
+
+    .warning {
+        color: red;
+    }
+</style>
+<div id="app" class='container' style='background-image:url(@currentTheme)'>
+    <div class='loadingContainer' v-if='pageStatus=="loading"'>
+        <img src='/img/loading.gif' />
+    </div>
+    <div v-if='pageStatus=="retry"'>
+        <button type="button" v-on:click='retryLoad '>重试</button>
+    </div>
+    <div class='voteTimeout' v-if='pageStatus=="lostvote"'>
+        <span class='lostvote'>抱歉 , 您超时未投票</span>
+        <span class='lostvote'> 请等待查看结果！</span>
+    </div>
+    <div v-if='pageStatus=="loaded"'>
+        <div class='logo '>
+            <span class='titleContainer'>
+                <span class='default'>@Model.VoteInfo.Name</span>
+                <span class='warning'>倒计时: {{timeToStop>0?timeToStop:'超时'}}</span>
+            </span>
+            <div class='right '>
+                <div class='number '>1</div>
+                <div class='status '>进行中</div>
+            </div>
+        </div>
+        <div class="warp">
+            <div class="options" v-for="item in voteList">
+                <img class='option ' mode='aspectFill ' :src='item.Value' onclick="showImg" :data-src='item.Value' />
+                <label>
+                    <input type="radio" class='optionInput ' :value="item.Key" v-model="selected" />
+                    <span class="optionCbx"></span>
+                </label>
+                <span class='optTxt'>{{item.Key }}</span>
+            </div>
+        </div>
+        <button type="button" v-on:click="voted">投票</button>
+    </div>
+</div>
+@section Scripts{
+<script>
+    var app2 = new Vue({
+        el: '#app',
+        data: {
+            title: '',
+            disable: false,
+            num: 1,
+            selected: '',
+            voteList: [],
+            loaded: false,
+            retry: false,
+            pageStatus: 'loaded' || 'retry' || 'voted' || 'lostvote',
+            tiemoutHanlder: 0,
+            timeToStop: 0
+        },
+        mounted: function () {
+            var self = this
+            this.timeToStop = Math.floor(- ((new Date() - Math.floor(globalData.endTimeStamp)) / 1000))
+            this.tiemoutHanlder = setTimeout(function () {
+                self.pageStatus = 'retry'
+            }, 20000)
+            this.getVoteInfo()
+        },
+        methods: {
+            retryLoad: function () {
+                this.getVoteInfo()
+            },
+
+            getVoteInfo: function () {
+                var _this = this;
+                this.pageStatus = 'loading'
+                $.ajax({
+                    url: '/vote/info',
+                    method: 'get',
+                    dataType: 'json',
+                    data: {
+                    },
+                    header: {
+                        'content-type': 'application/json' // 默认值
+                    },
+                    success: function (res) {
+                        clearTimeout(_this.tiemoutHanlder);
+                        if (res['voted']) {
+                            _this.pageStatus = 'voted'
+                        } else {
+                            voteTimer = setInterval(function () {
+                            }, 1000)
+                            _this.pageStatus = 'loaded';
+                            _this.voteList = res.voteList;
+                            _this.title = res.question;
+                            _this.id = res.Id;
+                        }
+                    }
+                })
+            },
+            checkboxChange: function (e) {
+                console.log(e.detail)
+            },
+            showImg: function (e) {
+                var src = e.currentTarget.dataset.src//获取data-src
+                //wx.downloadFile({
+                //    url: src,
+                //    success: function (res) {
+                //        console.log(res)
+                //        wx.previewImage({
+                //            current: res.tempFilePath,
+                //            urls: [res.tempFilePath]// 当前显示图片的http链接
+                //        })
+                //    }
+                //})
+
+            },
+            inArray: function (array, item) {
+                for (var i = 0; i < array.length; i++) {
+                    if (array[i] == item) {
+                        console.log(i)
+                        return i
+                    }
+                }
+                return -1
+            },
+            checkboxChange: function (e) {
+                this.selected = e.detail.value[e.detail.value.length - 1]
+            },
+            voted: function () {
+                var select = this.selected//.join(',')
+                var _this = this;
+                if (!select) {
+                    alert('请至少选择一项.')
+                    return;
+                }
+                if (confirm('确定给他投票吗')) {
+                    _this.processVoted(select);
+                }
+            },
+            processVoted: function (select) {
+                var userId = this.userId
+                var VoteId = this.id
+                $.ajax({
+                    url: '/vote/post', //仅为示例，并非真实的接口地址
+                    method: 'post',
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    data: JSON.stringify({
+                        //UserId: app.globalData.openId,
+                        VoteOption: select,
+                        VoteLog: {
+                            VoteID: VoteId,
+                            VoteOption: select
+                        },
+                        NickName: '' //|| globalData.userInfo.nickName || '',
+                    }),
+                    success: function (res) {
+                        console.log(res.data)
+                        if (res.msg == 'ok') {
+                            if (select != 'null')
+                                window.location = '/client/thanks'
+                        }
+                    }
+                })
+            }
+        }
+    })
+</script>
+}

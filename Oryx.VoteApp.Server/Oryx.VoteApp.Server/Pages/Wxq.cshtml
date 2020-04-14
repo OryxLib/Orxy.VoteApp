@@ -1,0 +1,149 @@
+﻿@page
+@model Oryx.VoteApp.Server.Pages.WxqModel
+@{
+    ViewData["Title"] = "文字讯息墙";
+    Layout = "_WxqLayout.cshtml";
+    //ViewData["wxqBg"] = "background-image:url('/images/WcqBgImg.jpg')";
+    ViewData["wxqBg"] = "background-image:url('/images/WxqPicBg.jpg')";
+}
+<style>
+    button.close {
+        display: none;
+        position: absolute;
+        right: 40px;
+        top: 46px;
+        color: #efe;
+    }
+
+    .list-group-item:hover button.close {
+        display: block;
+    }
+</style>
+<div class="container body-content">
+    <div style=" ">
+        <div class="voteLogArea">
+            <div class="voteLogContainer list-group">
+                @if (Model.WxqLogList != null)
+                {
+                    foreach (var item in Model.WxqLogList)
+                    {
+                        <div class="media list-group-item">
+                            <div class="media-left">
+                                <a href="#">
+                                    <img class="media-object" data-src="@item.Avarta" src="@item.Avarta" data-holder-rendered="true" style="width: 64px; height: 64px;">
+                                </a>
+                            </div>
+                            <div class="media-body">
+                                <div>@item.NickName:</div>
+                                <div style="word-break:break-all;">@item.Msg </div>
+                            </div>
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="deleteMsg(@item.Id,this)"><span aria-hidden="true">&times;</span></button>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .voteLogContainer {
+        padding-top: 20px;
+    }
+
+    .media.list-group-item {
+        font-size: 16px;
+    }
+</style>
+
+<script>
+    var socketlist = [];
+
+    var dataDic = [];
+    dataIndex = 0;
+    var dataObjList = new Array(@Model.WxqLogList.Count||0);
+    function deleteMsg(dataId, e) {
+        var msgIndex = $(e).closest('.list-group-item').index();
+        $(e).closest('.list-group-item').remove();
+        dataObjList.splice(msgIndex, 1);
+        $.ajax({
+            url: '/WxqFunc/DeleteMsg',
+            dataType: 'json',
+            type: 'post',
+            data: {
+                Id: dataId
+            },
+            success: function (res) {
+
+            }
+        })
+    }
+    function CreateWebSocket() {
+        var socket = new WebSocket((window.location.protocol.indexOf('https') > -1 ? "wss://" : "ws://") + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=wxq");
+        socketlist.push(socket);
+        socket.onopen = function (res) {
+            console.log(res);
+        }
+
+        socket.onmessage = function (res) {
+            console.log(res.data);
+            var dataObj = JSON.parse(res.data);
+            dataObjList.push(res.data)
+            if (dataObjList.length == 7) {
+                dataObjList.pop();
+                $('.voteLogContainer').children().last().remove();
+            }
+
+            var html = $('#voteLogChecked').html()
+                .replace(/{dataId}/g, dataObj.Id)
+                .replace(/{nickName}/g, dataObj.NickName)
+                .replace(/{avarta}/g, dataObj.Avarta)
+            if (dataObj.MsgType == 'txt') {
+                html = html.replace(/{msg}/g, dataObj.Msg)
+            } else {
+                html = html.replace(/{msg}/g, '<img  style="width: 200px;" src="' + dataObj.Msg + '"/>')
+            }
+            dataIndex++;
+            $('.voteLogContainer').prepend(html);
+            $('html, body, .content').animate({ scrollTop: $(document).height() }, 300);
+        }
+
+        socket.onerror = function (res) {
+            console.log(res);
+        }
+
+        function sendMsg() {
+            setInterval(function () {
+                socket.send("test data");
+            }, 3000);
+
+        }
+        setTimeout(sendMsg, 5000);
+    }
+
+    function checkedData(dataId) {
+        $.ajax({
+            url: '/WxqFunc/PostCheckedMsg',
+            type: 'post',
+            dataType: 'json',
+            data: {
+                msg: dataDic[dataId]
+            },
+            success: function (res) {
+                alert('操作成功')
+            },
+            error: function (err) {
+                alert('操作失败')
+            }
+        })
+    }
+    for (var i = 0; i < 1; i++) {
+        CreateWebSocket();
+    }
+
+    window.onunload = function () {
+        for (var i = 0; i < socketlist.length; i++) {
+            socketlist[i].close();
+        }
+    }
+
+</script>

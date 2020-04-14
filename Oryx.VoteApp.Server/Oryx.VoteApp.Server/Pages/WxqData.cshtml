@@ -1,0 +1,105 @@
+﻿@page
+@model Oryx.VoteApp.Server.Pages.WxqDataModel
+@{
+    ViewData["Title"] = "微信墙数据";
+}
+
+<ul class="list-group" id="msgList"></ul>
+
+<div class="navbar-fixed-bottom ">
+    <ul class="pagination">
+        @*<li class="disabled"><a href="#">&laquo;</a></li>
+            <li class="active"><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li><a href="#">&raquo;</a></li>*@
+    </ul>
+</div>
+
+@section scripts{
+    <script type="text/template" id="voteLogChecked" class="animated fadeIn">
+        <div class="media list-group-item">
+            <div class="media-left">
+                <a href="#">
+                    <img class="media-object" data-src="{avarta}" src="{avarta}" data-holder-rendered="true" style="width: 64px; height: 64px;">
+                </a>
+            </div>
+            <div class="media-body">
+                <div>{nickName}:</div>
+                <div>{msg} </div>
+            </div>
+            @*<button type="button" class="close" data-dismiss="alert" aria-label="Close" onclick="deleteMsg({dataId},this)"><span aria-hidden="true">&times;</span></button>*@
+        </div>
+    </script>
+    <script>
+        var pageNum = 0;
+        var pageCount = 0;
+        var pageSize = 20;
+        (function () {
+            getPageCount()
+            GoPage(0)
+        })();
+        function goNext() {
+            if (pageNum > 0) {
+                pageNum--;
+                GoPage(pageNum);
+            }
+        }
+        function goPrevios() {
+            if (pageNum < pageCount) {
+                pageNum++
+                GoPage(pageNum);
+            }
+        }
+        function getPageCount() {
+            $.ajax({
+                url: '/WxqFunc/WxqDataCount',
+                dataType: 'json',
+                type: 'post',
+                success: function (res) {
+                    if (res.success) {
+                        pageCount = res.count;
+                        for (var i = 0; i < pageCount / pageSize; i++) {
+                            $('.pagination').append(' <li><a href="javascript:GoPage(' + i + ');">' + (i + 1) + '</a></li>')
+                        }
+                    }
+                }
+            })
+        }
+        function GoPage(_skipCount) {
+            _skipCount = _skipCount * pageSize
+            $('#msgList').empty();
+            $.ajax({
+                url: '/WxqFunc/WxqData',
+                data: {
+                    skipCount: _skipCount
+                },
+                dataType: 'json',
+                type: 'post',
+                success: function (res) {
+                    console.log(res);
+                    if (res) {
+                        for (var i = 0; i < res.length; i++) {
+                            var item = res[i];
+                            var html = '';
+                            if (item.msgType == 'txt') {
+                                html = $('#voteLogChecked').html()
+                                    .replace(/{avarta}/g, item.avarta)
+                                    .replace(/{nickName}/g, item.nickName)
+                                    .replace(/{msg}/g, item.msg);
+                            } else {
+                                html = $('#voteLogChecked').html()
+                                    .replace(/{avarta}/g, item.avarta)
+                                    .replace(/{nickName}/g, item.nickName)
+                                    .replace(/{msg}/g, '<img style="height:200px;" src="' + item.msg + '" />');
+                            }
+                            $('#msgList').append(html)
+                        }
+                    }
+                }
+            })
+        }
+    </script>
+}

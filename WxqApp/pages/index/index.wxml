@@ -1,0 +1,57 @@
+<!--index.wxml-->
+<!-- <image class='banner' src='/img/banner.jpg'></image> -->
+<!-- <view class="userinfo ">
+    <button open-type="getUserInfo">获取头像昵称</button>
+    <button wx:if="{{!hasUserInfo && canIUse}} " open-type="getUserInfo " bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+    <block wx:else>
+      <image bindtap="bindViewTap " class="userinfo-avatar " src="{{userInfo.avatarUrl}} " background-size="cover "></image>
+      <text class="userinfo-nickname ">{{userInfo.nickName}}</text>
+    </block>
+  </view>
+  <view class="usermotto ">
+    <text class="user-motto ">{{motto}}</text>
+  </view> -->
+<block wx:if='{{!hasUserInfo}}'>
+  <view class="container" style='background-image:url({{bgImg}})'>
+    <view class="userinfo">
+      <button class='buttonLogin' open-type="getUserInfo" bindgetuserinfo="getUserInfo">登录</button>
+    </view>
+  </view>
+</block>
+<block wx:else>
+  <text class='banner'>微信墙</text>
+  <view class="container">
+
+    <form class='formMain'>
+      <view class="section txtBody">
+        <textarea class='txtContainer' placeholder="" bindinput='textInput' bindconfirm='textConfirm' value="{{msgData}}" show-confirm-bar='false' auto-focus style='background-color:white' />
+        <text class='txtLengthCounter'>{{msgData.length}}/140</text>
+      </view>
+      <view class="btn-rea" style='text-align:right;'>
+        <view wx:if='{{userInfo}}' class='userInfoContaienr'>
+          <image bindtap="bindViewTap " class="userinfo-avatar " src="{{userInfo.avatarUrl}} " background-size="cover "></image>
+          <text class="userinfo-nickname ">{{userInfo.nickName}}</text>
+        </view>
+        <!-- <button bindtap='postMsg' class='btn btnAction'>发送 | Send</button>  -->
+        <image src='/img/btnSend.png' class='btnSend' bindtap='postMsg'>发送</image>
+        <!-- <button bindtap='gobackVote' class='btn btnAction'>返回 | Go Bakc</button> -->
+      </view>
+      <view class='btn-area' style='text-align:center;'>
+        <image wx:if="{{previewImgSrc}}" src='{{previewImgSrc}}' mode='aspectFit'></image>
+        <image class='btnCamara' wx:else src='/img/btnCamara.png' bindtap="takePhoto"></image>
+        <!-- <button class='btn btnAction'>选择照片 | Check Img</button> -->
+      </view>
+    </form>
+    <!-- <view class="userinfo ">
+    <button open-type="getUserInfo">获取头像昵称</button>
+    <button wx:if="{{!hasUserInfo && canIUse}} " open-type="getUserInfo " bindgetuserinfo="getUserInfo"> 获取头像昵称 </button>
+    <block wx:else>
+      <image bindtap="bindViewTap " class="userinfo-avatar " src="{{userInfo.avatarUrl}} " background-size="cover "></image>
+      <text class="userinfo-nickname ">{{userInfo.nickName}}</text>
+    </block>
+  </view>
+  <view class="usermotto ">
+    <text class="user-motto ">{{motto}}</text>
+  </view> -->
+  </view>
+</block>

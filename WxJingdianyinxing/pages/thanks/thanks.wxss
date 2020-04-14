@@ -1,0 +1,6 @@
+/* pages/thanks/thanks.wxss */
+.title{
+  width:640rpx;
+  height: 200rpx;
+  margin-top: 300rpx;
+}

@@ -1,0 +1,24 @@
+<!--index.wxml-->
+<view class="container" style='background-image:url({{bgImg}})'>
+  <view class="userinfo">
+    <button wx:if="{{!hasUserInfo && canIUse}}" bindgetuserinfo="getUserInfo" open-type="getUserInfo"> 登录 </button>
+    <block wx:else>
+      <!-- <image class="userinfo-avatar" src="{{userInfo.avatarUrl}}" background-size="cover"></image>
+      <text class="userinfo-nickname">{{userInfo.nickName}}</text> -->
+
+      <!-- <text>
+          {{voteName1}}
+        </text>
+         <text>
+          {{voteName2}}
+        </text>  -->
+      <image src='{{displayTitle}}' mode='scaleToFill'></image>
+    </block>
+  </view>
+
+  <input name="password" wx:if="{{shouldLogin&&hasUserInfo}}" value="{{emCode}}" bindinput='staffNumInput' class='emCode' placeholder="员工编号 (6位数字)" />
+
+  <!-- <button class='btnAction' wx:if="{{hasUserInfo}}" bindtap='goVote'>進入投票 | Start Voting</button> -->
+  <image class='btnImg' wx:if="{{hasUserInfo}}" src='/img/btnStart.png' bindtap='goVote'></image>
+  <!-- <button class='btnAction' wx:if="{{hasUserInfo}}" bindtap='goWxq'>進入微信墙 | Start Msging</button> -->
+</view>

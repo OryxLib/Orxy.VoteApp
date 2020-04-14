@@ -1,0 +1,51 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="jsch\examples\**" />
+    <Compile Remove="jsch\jce\**" />
+    <EmbeddedResource Remove="jsch\examples\**" />
+    <EmbeddedResource Remove="jsch\jce\**" />
+    <None Remove="jsch\examples\**" />
+    <None Remove="jsch\jce\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="jsch\jce\AES128CBC.cs" />
+    <Compile Include="jsch\jce\BlowfishCBC.cs" />
+    <Compile Include="jsch\jce\DH.cs" />
+    <Compile Include="jsch\jce\HMACMD5.cs" />
+    <Compile Include="jsch\jce\HMACMD596.cs" />
+    <Compile Include="jsch\jce\HMACSHA1.cs" />
+    <Compile Include="jsch\jce\HMACSHA196.cs" />
+    <Compile Include="jsch\jce\KeyPairGenDSA.cs" />
+    <Compile Include="jsch\jce\KeyPairGenRSA.cs" />
+    <Compile Include="jsch\jce\MD5.cs" />
+    <Compile Include="jsch\jce\Random.cs" />
+    <Compile Include="jsch\jce\SHA1.cs" />
+    <Compile Include="jsch\jce\SignatureDSA.cs" />
+    <Compile Include="jsch\jce\SignatureRSA.cs" />
+    <Compile Include="jsch\jce\TripleDESCBC.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="DiffieHellman">
+      <HintPath>lib\DiffieHellman.dll</HintPath>
+    </Reference>
+    <Reference Include="Org.Mentalis.Security">
+      <HintPath>lib\Org.Mentalis.Security.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="lib\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DiffieHellman" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>

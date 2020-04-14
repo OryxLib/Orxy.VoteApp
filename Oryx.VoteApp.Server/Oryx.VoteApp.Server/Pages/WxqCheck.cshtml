@@ -1,0 +1,189 @@
+﻿@page  "{voteId?}"
+@model Oryx.VoteApp.Server.Pages.WxqCheckModel
+@{
+    ViewData["Title"] = "WxqCheck";
+    Layout = "_WxqLayout.cshtml";
+}
+<h1 style="color:white;">微信墙检查</h1>
+<div class="container body-content">
+    <div style=" ">
+        <div class=" ">
+            <button type="button" class="btn btn-primary" onclick="pullWxqLog()">更新</button>
+            @*<button type="button" class="btn btn-primary" onclick="clearWxqLog()">清空所有数据</button>*@
+            <div class="voteLogContainer list-group" style="margin-top:20px;">
+                @if (Model.WxqLogList != null)
+                {
+                    @foreach (var item in Model.WxqLogList)
+                    {
+                        <div class="media list-group-item">
+                            <div class="media-left">
+                                <a href="#">
+                                    <img class="media-object" data-src="@item.Avarta" src="@item.Avarta" data-holder-rendered="true" style="width: 64px; height: 64px;">
+                                </a>
+                            </div>
+                            <div class="media-body">
+                                <div>@item.NickName:</div>
+                                @if (item.MsgType == "txt")
+                                {
+                                    <div>@item.Msg </div>
+                                }
+                                else
+                                {
+                                    <img style="width: 200px;" src="@item.Msg" />
+                                }
+                                <div>
+                                    <button type="button" class="btn btn-success" onclick="checkedData(@item.Id,'@item.MsgType',this)">通过</button>
+                                    @*<a href="javascript: ;">通过</a>*@
+
+                                    <button type="button" class="btn btn-danger" onclick="deleteData(this)" style="margin-left:200px;">删除</button>
+
+                                    @*<a href="javascript:;" onclick="deleteData(this)">删除</a>*@
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var socketlist = [];
+
+    var dataDic = [];
+    dataIndex = 0;
+    function pullWxqLog() {
+        $('.voteLogContainer').empty();
+        $.ajax({
+            url: '/WxqFunc/PullWxqLog',
+            type: 'post',
+            dataType: 'json',
+            data: {
+                //msg: dataDic[dataId]
+            },
+            success: function (res) {
+                console.log(res);
+                for (var i = 0; i < res.length; i++) {
+                    processPushData(res[i])
+                }
+                //alert('操作成功')
+            },
+            error: function (err) {
+                //alert('操作失败')
+            }
+        })
+    }
+
+    function CreateWebSocket() {
+        var socket = new WebSocket((window.location.protocol.indexOf('https') > -1 ? "wss://" : "ws://") + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=wxqcheck");
+        socketlist.push(socket);
+        socket.onopen = function (res) {
+            console.log(res);
+        }
+
+        socket.onmessage = function (res) {
+            console.log(res.data);
+            //var dataObj = JSON.parse(res.data);
+            //dataDic.push(res.data)
+            //var html = $('#voteLog').html()
+            //    .replace(/{dataId}/g, dataIndex)
+            //    .replace(/{nickName}/g, dataObj.nickName)
+            //    .replace(/{avarta}/g, dataObj.avarta)
+            //if (dataObj.msgType == 'txt') {
+            //    html = html.replace(/{msg}/g, dataObj.msg)
+            //} else {
+            //    html = html.replace(/{msg}/g, '<img  style="width: 200px;" src="' + dataObj.msg + '"/>')
+            //}
+            //dataIndex++;
+            //$('.voteLogContainer').append(html);
+            //$('html, body, .content').animate({ scrollTop: $(document).height() }, 300);
+        }
+
+        socket.onerror = function (res) {
+            console.log(res);
+        }
+
+        function sendMsg() {
+            setInterval(function () {
+                socket.send("test data");
+            }, 3000);
+
+        }
+        setTimeout(sendMsg, 5000);
+    }
+    function deleteData(e) {
+        $(e).closest('.list-group-item').remove();
+    }
+    function clearWxqLog() {
+
+        //$.ajax({
+        //    url: '/wxqfunc/clearup',
+
+        //})
+    }
+    function checkedData(dataId, msgType, e) {
+        //var dataObj = JSON.parse(dataDic[dataId]);
+        $(e).closest('.list-group-item').remove();
+
+        if (msgType == 'txt') {
+            $.ajax({
+                url: '/WxqFunc/PostCheckedMsg',
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    //msg: dataDic[dataId]
+                    Id: dataId
+                },
+                success: function (res) {
+                    //alert('操作成功')
+                },
+                error: function (err) {
+                    //alert('操作失败')
+                }
+            })
+        }
+        else {
+            $.ajax({
+                url: '/WxqFunc/PostCheckedPic',
+                type: 'post',
+                dataType: 'json',
+                data: {
+                    Id: dataId
+                },
+                success: function (res) {
+                    //alert('操作成功')
+                },
+                error: function (err) {
+                    //alert('操作失败')
+                }
+            })
+        }
+    }
+    function processPushData(dataObj) {
+        dataDic.push(dataObj)
+        var html = $('#voteLog').html()
+            .replace(/{dataId}/g, dataObj.id)
+            .replace(/{nickName}/g, dataObj.nickName)
+            .replace(/{avarta}/g, dataObj.avarta)
+            .replace(/{msgType}/g, dataObj.msgType)
+        if (dataObj.msgType == 'txt') {
+            html = html.replace(/{msg}/g, dataObj.msg)
+        } else {
+            html = html.replace(/{msg}/g, '<img  style="width: 200px;" src="' + dataObj.msg + '"/>')
+        }
+        //dataIndex++;
+        $('.voteLogContainer').append(html);
+        $('html, body, .content').animate({ scrollTop: $(document).height() }, 300);
+    }
+    for (var i = 0; i < 1; i++) {
+        CreateWebSocket();
+    }
+
+    window.onunload = function () {
+        for (var i = 0; i < socketlist.length; i++) {
+            socketlist[i].close();
+        }
+    }
+
+</script>

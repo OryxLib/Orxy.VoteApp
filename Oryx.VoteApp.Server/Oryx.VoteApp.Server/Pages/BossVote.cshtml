@@ -1,0 +1,336 @@
+﻿@page "{Id?}"
+@model Oryx.VoteApp.Server.Pages.BossVoteModel
+@{
+    ViewData["Title"] = "BossVote";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>[@Model.VoteInfo.Name ] 投票现场</title>
+    <environment include="Development">
+        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
+              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+    </environment>
+    <link href="https://cdn.bootcss.com/animate.css/3.5.2/animate.min.css" rel="stylesheet">
+    <link href="~/css/bootstrap.theme.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+        body, html {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        .container_cus {
+            /*overflow-y: auto;
+            overflow-x: hidden;*/
+            overflow: hidden;
+            height: 80%;
+            padding: 50px;
+            margin-top: 37px;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .row {
+            height: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .aword {
+            width: 70px;
+            height: 103px;
+            position: absolute;
+            top: -103px;
+            background-size: 100%;
+        }
+
+            .aword.aword_top {
+                background-image: url('/images/aword1.png');
+            }
+
+            .aword.aword_middle {
+                background-image: url('/images/aword2.png');
+            }
+
+            .aword.aword_bottom {
+                background-image: url('/images/aword3.png');
+            }
+
+        .container {
+            width: 90%;
+        }
+
+        .flex-item-heading span {
+            color: white;
+        }
+
+        .flex-item {
+            text-align: center;
+            color: white;
+        }
+
+        .flex {
+            flex-wrap: nowrap;
+        }
+
+        .progressBarNum {
+            font-size: 26px;
+            position: relative;
+            top: -32px;
+            left: 4px;
+        }
+
+        .customerProgressbar .progressBarNum {
+            text-shadow: 2px 2px 2px rgb(232,105,2);
+        }
+
+        .bossProgressbar .progressBarNum {
+            text-shadow: 2px 2px 2px rgb(61,31,1);
+        }
+
+        .progress-bar:last-child:before {
+            border-radius: 20px;
+        }
+
+        .vote-progress {
+            overflow: initial;
+        }
+
+        .progress-bar-warning {
+            background-color: rgb(204,51,153) !important;
+        }
+
+        span#txtDaojishi {
+            font-size: 29px;
+            color: white;
+            /*position: absolute;*/
+            /*right: 149px;*/
+        }
+
+        .daojishiContainer {
+            border-bottom: solid 1px white;
+            width: 100%;
+            color: white;
+            font-size: 32px;
+            padding-left: 20px;
+        }
+
+        .progressTotalNum {
+            /* position: relative; */
+            /* top: -98px; */
+            color: white;
+            font-size: 25px;
+            text-shadow: 2px 2px 2px #0c84e4;
+            /*background-color: rgb(204,51,153) !important;*/
+        }
+
+        .flexItemTitle {
+            /*width: 200px;*/
+        }
+
+        .thumbnail {
+            width: 300px;
+            background-color: transparent;
+            border: none;
+            color: white;
+        }
+
+        .col4 {
+            width: 33%;
+            display: block;
+        }
+
+        .col-md-4 {
+            text-align: center;
+            padding: 0;
+        }
+
+        .thumbnail {
+            margin: 0 auto;
+        }
+
+        .cusbtn {
+            background-color: transparent;
+            /*background-image: url("~/images/btnVote.png");
+            background-repeat: no-repeat;
+            background-size: 100%;*/
+            width: 200px;
+            /* height: 200px; */
+            border: none;
+            margin: 0 auto;
+            display: block;
+            margin-top: -25px;
+            display: flex;
+            justify-content: space-around;
+            flex-grow: 0;
+            align-items: center;
+        }
+
+            .cusbtn img {
+                width: 100%;
+            }
+
+        .thanksImg {
+            display: none; 
+        }
+
+        .thumbnail .radio {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+@*<body style="padding:0;background:url('@Html.Raw("~/images/"+ Model.VoteInfo.VoteType+"_result.jpg")')">  *@
+
+<body style="padding:0;background:url('http://p83fh4l80.bkt.clouddn.com/voteApp/bossVoteDefault.jpg?v=');background-size: 100% 100%; background-repeat:no-repeat">
+    <div class="daojishiContainer">
+        Voting time:
+        <span id="txtDaojishi">
+
+        </span>
+    </div>
+
+    <div class="container_cus">
+        <img class="thanksImg" src="~/images/bossVote/thanks.png" />
+        <div class="optionContsiner row">
+            @foreach (var item in Model.VoteInfo.VoteOptions)
+            {
+                <div class="col-md-4">
+                    <div class="thumbnail">
+                        <label>
+                            <img src="@item.Value" alt="@item.Key">
+                            <div class="radio">
+                                <input type="radio" name="optionsRadios" class="optionsRadios" value="@item.Key">
+                                @item.Key
+                                <br />
+                                <span>@item.Description</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            }
+        </div>
+
+    </div>
+    <button class="cusbtn" onclick="addBuff()">
+        <img src="~/images/btnVote.png" />
+    </button>
+
+    <environment include="Development">
+        <script src="~/lib/jquery/dist/jquery.js"></script>
+        <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/site.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="https://ajax.aspnetcdn.com/ajax/jquery/jquery-2.2.0.min.js"
+                asp-fallback-src="~/lib/jquery/dist/jquery.min.js"
+                asp-fallback-test="window.jQuery"
+                crossorigin="anonymous"
+                integrity="sha384-K+ctZQ+LL8q6tP7I94W+qzQsfRV2a+AfHIi9k8z8l9ggpc8X+Ytst4yBo/hH+8Fk">
+        </script>
+        <script src="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/bootstrap.min.js"
+                asp-fallback-src="~/lib/bootstrap/dist/js/bootstrap.min.js"
+                asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
+                crossorigin="anonymous"
+                integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
+        </script>
+        <script src="~/js/site.min.js" asp-append-version="true"></script>
+    </environment>
+    <script>
+        var bossId='@Request.Query["bossId"]'
+    </script>
+    <script type="text/template" id="voteLog" class="animated fadeIn">
+        <div class="media">
+            <div class="media-left">
+                <a href="#">
+                    <img class="media-object" data-src="holder.js/64x64" alt="64x64" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/PjxzdmcgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIHZpZXdCb3g9IjAgMCA2NCA2NCIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+PCEtLQpTb3VyY2UgVVJMOiBob2xkZXIuanMvNjR4NjQKQ3JlYXRlZCB3aXRoIEhvbGRlci5qcyAyLjYuMC4KTGVhcm4gbW9yZSBhdCBodHRwOi8vaG9sZGVyanMuY29tCihjKSAyMDEyLTIwMTUgSXZhbiBNYWxvcGluc2t5IC0gaHR0cDovL2ltc2t5LmNvCi0tPjxkZWZzPjxzdHlsZSB0eXBlPSJ0ZXh0L2NzcyI+PCFbQ0RBVEFbI2hvbGRlcl8xNjJhMDU5MzBkOSB0ZXh0IHsgZmlsbDojQUFBQUFBO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1mYW1pbHk6QXJpYWwsIEhlbHZldGljYSwgT3BlbiBTYW5zLCBzYW5zLXNlcmlmLCBtb25vc3BhY2U7Zm9udC1zaXplOjEwcHQgfSBdXT48L3N0eWxlPjwvZGVmcz48ZyBpZD0iaG9sZGVyXzE2MmEwNTkzMGQ5Ij48cmVjdCB3aWR0aD0iNjQiIGhlaWdodD0iNjQiIGZpbGw9IiNFRUVFRUUiLz48Zz48dGV4dCB4PSIxMy4xNzk2ODc1IiB5PSIzNi41Ij42NHg2NDwvdGV4dD48L2c+PC9nPjwvc3ZnPg==" data-holder-rendered="true" style="width: 64px; height: 64px;">
+                </a>
+            </div>
+            <div class="media-body">
+                用户{index} 向1号投票
+            </div>
+        </div>
+    </script>
+    <script src="https://unpkg.com/qiniu-js@2.1.2/dist/qiniu.min.js"></script>
+    <script>
+        var isEnable =@(Model.VoteInfo.IsEnable ? "true":"false");
+        var  timeToStop= Math.floor(((new Date() - Math.floor(@Model.VoteInfo.EnableStartTime)) / 1000))
+        var daojishi =@Model.VoteInfo.CloseSeconds- timeToStop;
+        daojishi *= 1000;
+        timer = setInterval(function () {
+            var timeshow = new Date().toLocaleString().replace(/^\.\d+Z$/g, '').replace(/\T/g, ' ')
+            var timeToHoure = (daojishi - 60 * 60 * 1000)
+            var timeToMiniutes = (daojishi - timeToHoure - 60 * 1000)
+            var timeToSeconds = daojishi - timeToHoure - timeToMiniutes
+
+            var t = daojishi
+            var seconds = Math.floor((t / 1000) % 60)
+            var minutes = Math.floor((t / 1000 / 60) % 60)
+            var hours = Math.floor((t / (1000 * 60 * 60)) % 24)
+            var days = Math.floor(t / (1000 * 60 * 60 * 24))
+
+            if (daojishi > 0 && isEnable) {
+                var txtSum="";
+                if (days>0) {
+                    txtSum += days + " day "
+                }
+                if (hours > 0) {
+                    txtSum += hours + " hour "
+                }
+                if (minutes > 0) {
+                    txtSum += minutes + " min "
+                }
+                if (seconds >= 0) {
+                    txtSum += seconds + " sec"
+                }
+                if (!minutes&&seconds == 1) {
+                    setTimeout(function () {
+                        $('#txtDaojishi').text('')
+                    },1000)
+                }
+                $('#txtDaojishi').text(txtSum)
+            } else {
+            }
+            daojishi -= 1000;
+        }, 1000)
+    </script>
+    <script>
+        function addBuff(voteOption) {
+            var voteValue = $('.optionsRadios:checked').val();
+            if (confirm('确定投票给他吗?')) {
+                $.ajax({
+                    url: '/vote/AddBuff',
+                    dataType: 'json',
+                    data: {
+                        voteId:@Model.VoteInfo.Id,
+                        option: voteValue,
+                        bossId: bossId
+                    },
+                    type: 'post',
+                    success: function (res) {
+                        $('.optionContsiner').hide()
+                        $('.cusbtn').hide();
+                        $('.thanksImg').show();
+                    },
+                    error: function (err) {
+
+                     }
+                })
+            }
+        }
+    </script>
+</body>
+</html>
+

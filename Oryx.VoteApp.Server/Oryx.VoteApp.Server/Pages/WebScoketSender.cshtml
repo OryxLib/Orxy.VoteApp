@@ -1,0 +1,46 @@
+﻿@page
+@model Oryx.VoteApp.Server.Pages.WebScoketSenderModel
+@{
+    ViewData["Title"] = "WebScoketSender";
+}
+
+<h2>WebScoketSender</h2>
+
+
+<script>
+    var socketlist = [];
+    function CreateWebSocket() {
+        var socket = new WebSocket("ws://" + window.window.location.hostname + (window.window.location.port ? (":" + window.location.port) : "") + "/ws?key=testKey");
+        socketlist.push(socket);
+        socket.onopen = function (res) {
+            console.log(res);
+        }
+
+        socket.onmessage = function (res) {
+            console.log(res.data);
+        }
+
+        socket.onerror = function (res) {
+            console.log(res);
+        }
+
+        function sendMsg() {
+            setInterval(function () {
+                socket.send("test data");
+            }, 3000);
+
+        }
+       setTimeout(sendMsg, 5000);
+    }
+
+    for (var i = 0; i < 1; i++) {
+        CreateWebSocket();
+    }
+
+    //window.onunload = function () {
+    //    for (var i = 0; i < socketlist.length; i++) {
+    //        socketlist[i].close();
+    //    }
+    //}
+
+</script>

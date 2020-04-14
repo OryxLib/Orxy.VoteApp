@@ -1,0 +1,45 @@
+<!--pages/vote/vote.wxml-->
+<view class='container' style='background-image:url({{bgImg}})'>
+
+  <view class='loadingContainer' wx:if='{{pageStatus=="loading"}}'>
+    <image src='/img/loading.gif'></image>
+  </view>
+  <view wx:if='{{pageStatus=="retry"}}'>
+    <button bindtap='retryLoad '>重试</button>
+  </view>
+  <view class='voteTimeout' wx:if='{{pageStatus=="lostvote"}}'>
+    <text class='lostvote'>抱歉, 您超时未投票
+    请等待查看结果
+    </text>
+    <text class='lostvote'>Sorry the voting time is up
+    Please check with the result afterwards
+    </text>
+  </view>
+
+  <block wx:if='{{pageStatus=="loaded"}}'>
+    <view class='logo '>
+      <text class='titleContainer'> 
+      <!-- <text class='default'>{{title}}</text> -->
+      <text class='warning'>  Voting time: {{timeToStop>0?timeToStopDisplay:'超时'}}  </text>
+      </text>
+      <!-- <view class='right '>
+        <view class='number '>1</view>
+        <view class='status '>进行中</view>
+      </view> -->
+    </view>
+    <scroll-view scroll-y class="warp">
+      <checkbox-group bindchange="checkboxChange">
+
+        <view class="options" wx:for="{{options}}">
+          <text class='optTxt' style='verticle-align:bottom;'>{{item.Key}} </text>
+          <image class='option ' mode='aspectFill ' src='{{item.Value}}?imageView2/1/w/300/h/300/q/75|imageslim' bindtap="showImg" data-src='{{item.Value}} '></image>
+           <text class='optTxt'>{{item.Description}} </text>
+          <checkbox class='optionCbx ' value="{{item.Key}}" data-id='{{item.Id}}' checked='{{item.Key==selected}}'></checkbox>
+        </view>
+      </checkbox-group>
+    </scroll-view>
+
+    <!-- <button class='btnAction' bindtap="voted">確認 | Confirm</button> -->
+    <image class='btnImg' src='/img/btnVote.png' bindtap="voted"></image>
+  </block>
+</view>
